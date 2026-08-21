@@ -1,0 +1,1870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Money Tracker</title>
+
+<style>
+
+:root{
+    --bg:#fbf5ec;
+    --card:#fffaf3;
+    --text:#3d2b20;
+    --muted:#8b7567;
+    --accent:#b8663f;
+    --accent2:#d98a5b;
+    --line:#ead9ca;
+    --green:#4f8062;
+    --red:#b9574d;
+    --shadow:0 5px 18px rgba(111,72,45,.10);
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:Arial,sans-serif;
+}
+
+/* HEADER */
+
+header{
+    background:linear-gradient(135deg,#a95738,#c9784f);
+    color:white;
+    padding:15px 18px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    position:sticky;
+    top:0;
+    z-index:20;
+    box-shadow:0 3px 12px rgba(90,50,30,.18);
+}
+
+header h2{
+    margin:0;
+    font-size:20px;
+}
+
+.menu-btn{
+    border:0;
+    background:rgba(255,255,255,.14);
+    color:white;
+    font-size:25px;
+    width:40px;
+    height:40px;
+    border-radius:12px;
+    cursor:pointer;
+}
+
+/* MENU */
+
+.menu{
+    display:none;
+    position:absolute;
+    right:12px;
+    top:62px;
+    background:var(--card);
+    width:230px;
+    border-radius:14px;
+    box-shadow:0 8px 25px rgba(70,40,20,.20);
+    overflow:hidden;
+}
+
+.menu button{
+    width:100%;
+    border:0;
+    background:transparent;
+    color:var(--text);
+    padding:14px 16px;
+    text-align:left;
+    font-size:15px;
+}
+
+.menu button:hover{
+    background:#f5e6d8;
+}
+
+/* CONTAINER */
+
+.container{
+    max-width:620px;
+    margin:auto;
+    padding:16px;
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+}
+
+/* WELCOME */
+
+.welcome{
+    padding:4px 3px 12px;
+}
+
+.welcome h3{
+    margin:0 0 4px;
+    font-size:22px;
+}
+
+.welcome p{
+    margin:0;
+    color:var(--muted);
+    font-size:13px;
+}
+
+/* CARDS */
+
+.card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:17px;
+    padding:17px;
+    margin-bottom:13px;
+    box-shadow:var(--shadow);
+}
+
+.account{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.account-left{
+    display:flex;
+    align-items:center;
+    gap:11px;
+}
+
+.icon{
+    width:34px;
+    height:34px;
+    border-radius:11px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    background:#f2dfcf;
+}
+
+.account h3{
+    margin:0 0 3px;
+    font-size:16px;
+}
+
+.small{
+    font-size:12px;
+    color:var(--muted);
+}
+
+.amount{
+    font-size:21px;
+    font-weight:700;
+}
+
+/* SUMMARY */
+
+.summary{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+    margin-bottom:15px;
+}
+
+.summary div{
+    background:var(--card);
+    border:1px solid var(--line);
+    padding:13px 6px;
+    text-align:center;
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    font-size:12px;
+    color:var(--muted);
+}
+
+.summary strong{
+    display:block;
+    margin-top:6px;
+    color:var(--text);
+    font-size:16px;
+}
+
+/* FORM */
+
+.section-title{
+    font-size:16px;
+    margin:18px 2px 9px;
+}
+
+label{
+    display:block;
+    font-weight:700;
+    font-size:13px;
+    margin:13px 0 6px;
+}
+
+input,
+select,
+textarea{
+    width:100%;
+    padding:12px;
+    border:1px solid #dfcabb;
+    background:#fffdf9;
+    color:var(--text);
+    border-radius:10px;
+    font-size:15px;
+    outline:none;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    border-color:var(--accent);
+}
+
+textarea{
+    min-height:70px;
+    resize:vertical;
+}
+
+.row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+}
+
+/* CHOICE BUTTONS */
+
+.choice{
+    padding:11px;
+    border:1px solid #dfcabb;
+    border-radius:10px;
+    background:#fffdf9;
+    color:var(--text);
+    cursor:pointer;
+    font-size:14px;
+}
+
+.choice.active{
+    background:#b8663f;
+    color:#fff;
+    border-color:#b8663f;
+}
+
+/* SAVE BUTTON */
+
+.save{
+    width:100%;
+    padding:14px;
+    margin-top:18px;
+    border:0;
+    border-radius:11px;
+    background:linear-gradient(135deg,#b8663f,#d27d52);
+    color:#fff;
+    font-size:16px;
+    font-weight:700;
+    box-shadow:0 4px 10px rgba(168,91,55,.20);
+}
+
+/* QUICK BUTTONS */
+
+.quick{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+    margin-top:10px;
+}
+
+.quick button{
+    border:1px solid var(--line);
+    background:var(--card);
+    color:var(--text);
+    padding:12px;
+    border-radius:12px;
+    font-size:14px;
+}
+
+/* TRANSACTION */
+
+.tx{
+    padding:13px 0;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+}
+
+.income{
+    color:var(--green);
+}
+
+.expense{
+    color:var(--red);
+}
+
+.empty{
+    text-align:center;
+    color:var(--muted);
+    padding:25px;
+}
+
+.report-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.report-head h3{
+    margin:0;
+}
+
+/* MOBILE */
+
+@media(max-width:420px){
+
+    .container{
+        padding:12px;
+    }
+
+    .summary{
+        gap:5px;
+    }
+
+    .summary div{
+        padding:11px 3px;
+    }
+
+    .summary strong{
+        font-size:14px;
+    }
+
+    .amount{
+        font-size:18px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+
+<header>
+
+    <h2>💰 Money Tracker</h2>
+
+    <button
+        class="menu-btn"
+        onclick="toggleMenu()">
+        ⋮
+    </button>
+
+    <div
+        class="menu"
+        id="menu">
+
+        <button onclick="page('home')">
+            🏠 Home
+        </button>
+
+        <button onclick="page('add')">
+            ➕ Add Transaction
+        </button>
+
+        <button onclick="page('monthly')">
+            📅 Monthly Report
+        </button>
+
+        <button onclick="page('yearly')">
+            📊 Yearly Report
+        </button>
+
+        <button onclick="page('history')">
+            📜 Transaction History
+        </button>
+
+        <button onclick="page('accounts')">
+            💰 Accounts
+        </button>
+
+    </div>
+
+</header>
+
+
+<main class="container">
+
+
+<!-- HOME -->
+
+<section
+    id="home"
+    class="page active">
+
+    <div class="welcome">
+
+        <h3>
+            Good to see you 👋
+        </h3>
+
+        <p>
+            Keep every rupee in control.
+        </p>
+
+    </div>
+
+
+    <!-- CASH -->
+
+    <div class="card account">
+
+        <div class="account-left">
+
+            <div class="icon">
+                💵
+            </div>
+
+            <div>
+
+                <h3>
+                    Cash
+                </h3>
+
+                <span class="small">
+                    Current balance
+                </span>
+
+            </div>
+
+        </div>
+
+        <div
+            class="amount"
+            id="cashBalance">
+
+            ₹0
+
+        </div>
+
+    </div>
+
+
+    <!-- GPAY -->
+
+    <div class="card account">
+
+        <div class="account-left">
+
+            <div class="icon">
+                📲
+            </div>
+
+            <div>
+
+                <h3>
+                    GPay
+                </h3>
+
+                <span class="small">
+                    Current balance
+                </span>
+
+            </div>
+
+        </div>
+
+        <div
+            class="amount"
+            id="gpayBalance">
+
+            ₹0
+
+        </div>
+
+    </div>
+
+
+    <!-- BANK -->
+
+    <div class="card account">
+
+        <div class="account-left">
+
+            <div class="icon">
+                🏦
+            </div>
+
+            <div>
+
+                <h3>
+                    Bank
+                </h3>
+
+                <span class="small">
+                    Current balance
+                </span>
+
+            </div>
+
+        </div>
+
+        <div
+            class="amount"
+            id="bankBalance">
+
+            ₹0
+
+        </div>
+
+    </div>
+
+
+    <!-- CARD -->
+
+    <div class="card account">
+
+        <div class="account-left">
+
+            <div class="icon">
+                💳
+            </div>
+
+            <div>
+
+                <h3>
+                    Card
+                </h3>
+
+                <span class="small">
+                    Current balance
+                </span>
+
+            </div>
+
+        </div>
+
+        <div
+            class="amount"
+            id="cardBalance">
+
+            ₹0
+
+        </div>
+
+    </div>
+
+
+    <h3
+        class="section-title"
+        id="currentMonth">
+    </h3>
+
+
+    <!-- SUMMARY -->
+
+    <div class="summary">
+
+        <div>
+
+            Income
+
+            <strong id="income">
+                ₹0
+            </strong>
+
+        </div>
+
+        <div>
+
+            Expense
+
+            <strong id="expense">
+                ₹0
+            </strong>
+
+        </div>
+
+        <div>
+
+            Balance
+
+            <strong id="balance">
+                ₹0
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <button
+        class="save"
+        onclick="page('add')">
+
+        ＋ ADD TRANSACTION
+
+    </button>
+
+
+    <div class="quick">
+
+        <button
+            onclick="page('monthly')">
+
+            📅 Monthly Report
+
+        </button>
+
+        <button
+            onclick="page('history')">
+
+            📜 History
+
+        </button>
+
+    </div>
+
+</section>
+
+
+
+<!-- ADD TRANSACTION -->
+
+<section
+    id="add"
+    class="page">
+
+    <h2>
+        ➕ Add Transaction
+    </h2>
+
+
+    <div class="card">
+
+
+        <!-- DATE -->
+
+        <label>
+            Date
+        </label>
+
+        <input
+            type="date"
+            id="date">
+
+
+        <!-- TYPE -->
+
+        <label>
+            Transaction Type
+        </label>
+
+        <div class="row">
+
+            <button
+                id="expenseBtn"
+                class="choice active"
+                onclick="setType('Expense')">
+
+                💸 Expense
+
+            </button>
+
+            <button
+                id="incomeBtn"
+                class="choice"
+                onclick="setType('Income')">
+
+                💰 Income
+
+            </button>
+
+        </div>
+
+
+        <!-- CATEGORY -->
+
+        <label>
+            Category
+        </label>
+
+        <select id="category">
+
+            <option>
+                🍛 Food
+            </option>
+
+            <option>
+                ⛽ Petrol
+            </option>
+
+            <option>
+                🛍️ Shopping
+            </option>
+
+            <option>
+                🏠 House
+            </option>
+
+            <option>
+                💡 EB / Electricity
+            </option>
+
+            <option>
+                📱 Mobile
+            </option>
+
+            <option>
+                💊 Medical
+            </option>
+
+            <option>
+                🎓 Education
+            </option>
+
+            <option>
+                🚌 Travel
+            </option>
+
+            <option>
+                💳 EMI
+            </option>
+
+            <option>
+                🎬 Entertainment
+            </option>
+
+            <option>
+                👤 Personal
+            </option>
+
+            <option>
+                💼 Salary
+            </option>
+
+            <option>
+                📦 Other Income
+            </option>
+
+            <option>
+                📝 Other
+            </option>
+
+        </select>
+
+
+        <!-- PAYMENT -->
+
+        <label>
+            Payment Method
+        </label>
+
+        <div class="row">
+
+            <button
+                id="cashBtn"
+                class="choice active"
+                onclick="setPayment('Cash')">
+
+                💵 Cash
+
+            </button>
+
+            <button
+                id="gpayBtn"
+                class="choice"
+                onclick="setPayment('GPay')">
+
+                📲 GPay
+
+            </button>
+
+            <button
+                id="bankBtn"
+                class="choice"
+                onclick="setPayment('Bank')">
+
+                🏦 Bank
+
+            </button>
+
+            <button
+                id="cardBtn"
+                class="choice"
+                onclick="setPayment('Card')">
+
+                💳 Card
+
+            </button>
+
+        </div>
+
+
+        <!-- AMOUNT -->
+
+        <label>
+            Amount
+        </label>
+
+        <input
+            type="number"
+            id="amount"
+            min="0"
+            step="0.01"
+            placeholder="Enter amount">
+
+
+        <!-- NOTE -->
+
+        <label>
+            Note
+        </label>
+
+        <textarea
+            id="note"
+            placeholder="Optional">
+        </textarea>
+
+
+        <button
+            class="save"
+            onclick="saveTx()">
+
+            💾 SAVE TRANSACTION
+
+        </button>
+
+    </div>
+
+</section>
+
+
+
+<!-- MONTHLY REPORT -->
+
+<section
+    id="monthly"
+    class="page">
+
+    <h2>
+        📅 Monthly Report
+    </h2>
+
+    <div class="card">
+
+        <label>
+            Select Month
+        </label>
+
+        <input
+            type="month"
+            id="monthSelect"
+            onchange="monthlyReport()">
+
+    </div>
+
+    <div id="monthlyResult"></div>
+
+</section>
+
+
+
+<!-- YEARLY REPORT -->
+
+<section
+    id="yearly"
+    class="page">
+
+    <h2>
+        📊 Yearly Report
+    </h2>
+
+    <div class="card">
+
+        <label>
+            Select Year
+        </label>
+
+        <select
+            id="yearSelect"
+            onchange="yearlyReport()">
+        </select>
+
+    </div>
+
+    <div id="yearlyResult"></div>
+
+</section>
+
+
+
+<!-- HISTORY -->
+
+<section
+    id="history"
+    class="page">
+
+    <h2>
+        📜 Transaction History
+    </h2>
+
+    <div id="historyList"></div>
+
+</section>
+
+
+
+<!-- ACCOUNTS -->
+
+<section
+    id="accounts"
+    class="page">
+
+    <h2>
+        💰 Accounts
+    </h2>
+
+    <div class="card">
+
+
+        <label>
+            💵 Cash Opening Balance
+        </label>
+
+        <input
+            type="number"
+            id="openCash">
+
+
+        <label>
+            📲 GPay Opening Balance
+        </label>
+
+        <input
+            type="number"
+            id="openGpay">
+
+
+        <label>
+            🏦 Bank Opening Balance
+        </label>
+
+        <input
+            type="number"
+            id="openBank">
+
+
+        <label>
+            💳 Card Opening Balance
+        </label>
+
+        <input
+            type="number"
+            id="openCard">
+
+
+        <button
+            class="save"
+            onclick="saveOpenings()">
+
+            💾 SAVE OPENING BALANCES
+
+        </button>
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+
+<script>
+
+/* =========================
+   DATA STORAGE
+========================= */
+
+let tx =
+JSON.parse(
+    localStorage.getItem(
+        "moneyTrackerTx"
+    ) || "[]"
+);
+
+let opening =
+JSON.parse(
+    localStorage.getItem(
+        "moneyTrackerOpening"
+    ) ||
+    '{"Cash":0,"GPay":0,"Bank":0,"Card":0}'
+);
+
+let type = "Expense";
+
+let payment = "Cash";
+
+
+const $ =
+id =>
+document.getElementById(id);
+
+
+const today =
+new Date();
+
+
+$("date").value =
+today.toISOString().slice(0,10);
+
+
+$("monthSelect").value =
+today.toISOString().slice(0,7);
+
+
+
+/* =========================
+   MONEY FORMAT
+========================= */
+
+function money(n){
+
+    return "₹" +
+    Number(n).toLocaleString(
+        "en-IN",
+        {
+            maximumFractionDigits:2
+        }
+    );
+
+}
+
+
+
+/* =========================
+   MENU
+========================= */
+
+function toggleMenu(){
+
+    let menu =
+    $("menu");
+
+    menu.style.display =
+    menu.style.display === "block"
+    ? "none"
+    : "block";
+
+}
+
+
+
+/* =========================
+   PAGE NAVIGATION
+========================= */
+
+function page(id){
+
+    document
+    .querySelectorAll(".page")
+    .forEach(
+        x =>
+        x.classList.remove("active")
+    );
+
+
+    $(id)
+    .classList
+    .add("active");
+
+
+    $("menu")
+    .style.display = "none";
+
+
+    if(id === "home")
+        home();
+
+    if(id === "monthly")
+        monthlyReport();
+
+    if(id === "yearly")
+        yearlyReport();
+
+    if(id === "history")
+        historyReport();
+
+    if(id === "accounts")
+        loadOpenings();
+
+}
+
+
+
+/* =========================
+   TRANSACTION TYPE
+========================= */
+
+function setType(v){
+
+    type = v;
+
+
+    $("expenseBtn")
+    .classList
+    .toggle(
+        "active",
+        v === "Expense"
+    );
+
+
+    $("incomeBtn")
+    .classList
+    .toggle(
+        "active",
+        v === "Income"
+    );
+
+}
+
+
+
+/* =========================
+   PAYMENT METHOD
+========================= */
+
+function setPayment(v){
+
+    payment = v;
+
+
+    [
+        "Cash",
+        "GPay",
+        "Bank",
+        "Card"
+    ]
+    .forEach(
+        a => {
+
+            $(a.toLowerCase()+"Btn")
+            .classList
+            .toggle(
+                "active",
+                a === v
+            );
+
+        }
+    );
+
+}
+
+
+
+/* =========================
+   SAVE TRANSACTION
+========================= */
+
+function saveTx(){
+
+    let amount =
+    parseFloat(
+        $("amount").value
+    );
+
+
+    if(
+        !amount ||
+        amount <= 0
+    ){
+
+        alert(
+            "Please enter amount"
+        );
+
+        return;
+
+    }
+
+
+    tx.push({
+
+        id:Date.now(),
+
+        date:
+        $("date").value,
+
+        type:type,
+
+        category:
+        $("category").value,
+
+        payment:payment,
+
+        amount:amount,
+
+        note:
+        $("note").value
+
+    });
+
+
+    localStorage.setItem(
+        "moneyTrackerTx",
+        JSON.stringify(tx)
+    );
+
+
+    $("amount").value = "";
+
+    $("note").value = "";
+
+
+    alert(
+        "Transaction saved!"
+    );
+
+
+    page("home");
+
+}
+
+
+
+/* =========================
+   ACCOUNT BALANCE
+========================= */
+
+function acc(account){
+
+    let balance =
+    Number(
+        opening[account] || 0
+    );
+
+
+    tx.forEach(
+        t => {
+
+            if(
+                t.payment === account
+            ){
+
+                if(
+                    t.type === "Income"
+                ){
+
+                    balance +=
+                    Number(t.amount);
+
+                }
+                else{
+
+                    balance -=
+                    Number(t.amount);
+
+                }
+
+            }
+
+        }
+    );
+
+
+    return balance;
+
+}
+
+
+
+/* =========================
+   HOME
+========================= */
+
+function home(){
+
+    $("cashBalance")
+    .textContent =
+    money(
+        acc("Cash")
+    );
+
+
+    $("gpayBalance")
+    .textContent =
+    money(
+        acc("GPay")
+    );
+
+
+    $("bankBalance")
+    .textContent =
+    money(
+        acc("Bank")
+    );
+
+
+    $("cardBalance")
+    .textContent =
+    money(
+        acc("Card")
+    );
+
+
+    $("currentMonth")
+    .textContent =
+    today.toLocaleString(
+        "en-IN",
+        {
+            month:"long",
+            year:"numeric"
+        }
+    );
+
+
+    let key =
+    today
+    .toISOString()
+    .slice(0,7);
+
+
+    let list =
+    tx.filter(
+        t =>
+        t.date.startsWith(key)
+    );
+
+
+    let inc =
+    list
+    .filter(
+        t =>
+        t.type === "Income"
+    )
+    .reduce(
+        (a,t) =>
+        a + t.amount,
+        0
+    );
+
+
+    let exp =
+    list
+    .filter(
+        t =>
+        t.type === "Expense"
+    )
+    .reduce(
+        (a,t) =>
+        a + t.amount,
+        0
+    );
+
+
+    $("income")
+    .textContent =
+    money(inc);
+
+
+    $("expense")
+    .textContent =
+    money(exp);
+
+
+    $("balance")
+    .textContent =
+    money(
+        inc - exp
+    );
+
+}
+
+
+
+/* =========================
+   REPORT
+========================= */
+
+function report(
+    list,
+    target
+){
+
+    let inc =
+    list
+    .filter(
+        t =>
+        t.type === "Income"
+    )
+    .reduce(
+        (a,t) =>
+        a+t.amount,
+        0
+    );
+
+
+    let exp =
+    list
+    .filter(
+        t =>
+        t.type === "Expense"
+    )
+    .reduce(
+        (a,t) =>
+        a+t.amount,
+        0
+    );
+
+
+    let categories = {};
+
+    let payments = {};
+
+
+    list
+    .filter(
+        t =>
+        t.type === "Expense"
+    )
+    .forEach(
+        t => {
+
+            categories[t.category] =
+            (
+                categories[t.category] ||
+                0
+            ) + t.amount;
+
+
+            payments[t.payment] =
+            (
+                payments[t.payment] ||
+                0
+            ) + t.amount;
+
+        }
+    );
+
+
+    let html = `
+
+    <div class="summary">
+
+        <div>
+            Income
+            <strong>
+                ${money(inc)}
+            </strong>
+        </div>
+
+        <div>
+            Expense
+            <strong>
+                ${money(exp)}
+            </strong>
+        </div>
+
+        <div>
+            Balance
+            <strong>
+                ${money(inc-exp)}
+            </strong>
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="report-head">
+
+            <h3>
+                Category Expense
+            </h3>
+
+            📊
+
+        </div>
+    `;
+
+
+    Object
+    .keys(categories)
+    .forEach(
+        k => {
+
+            html += `
+
+            <div class="tx">
+
+                <span>
+                    ${k}
+                </span>
+
+                <strong>
+                    ${money(
+                        categories[k]
+                    )}
+                </strong>
+
+            </div>
+
+            `;
+
+        }
+    );
+
+
+    html += `
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="report-head">
+
+            <h3>
+                Payment Expense
+            </h3>
+
+            💳
+
+        </div>
+    `;
+
+
+    Object
+    .keys(payments)
+    .forEach(
+        k => {
+
+            html += `
+
+            <div class="tx">
+
+                <span>
+                    ${k}
+                </span>
+
+                <strong>
+                    ${money(
+                        payments[k]
+                    )}
+                </strong>
+
+            </div>
+
+            `;
+
+        }
+    );
+
+
+    html += `
+
+    </div>
+
+    `;
+
+
+    $(target)
+    .innerHTML =
+    html;
+
+}
+
+
+
+/* =========================
+   MONTHLY REPORT
+========================= */
+
+function monthlyReport(){
+
+    let month =
+    $("monthSelect").value;
+
+
+    report(
+
+        tx.filter(
+            t =>
+            t.date.startsWith(
+                month
+            )
+        ),
+
+        "monthlyResult"
+
+    );
+
+}
+
+
+
+/* =========================
+   YEARLY REPORT
+========================= */
+
+function yearlyReport(){
+
+    let year =
+    $("yearSelect").value;
+
+
+    report(
+
+        tx.filter(
+            t =>
+            t.date.startsWith(
+                year
+            )
+        ),
+
+        "yearlyResult"
+
+    );
+
+}
+
+
+
+/* =========================
+   HISTORY
+========================= */
+
+function historyReport(){
+
+    let list =
+    [...tx].reverse();
+
+
+    if(
+        !list.length
+    ){
+
+        $("historyList")
+        .innerHTML =
+        `
+        <div class="empty">
+            No transactions yet.
+        </div>
+        `;
+
+        return;
+
+    }
+
+
+    $("historyList")
+    .innerHTML =
+
+    list
+    .map(
+        t => `
+
+        <div class="card">
+
+            <div class="tx">
+
+                <div>
+
+                    <b>
+                        ${t.category}
+                    </b>
+
+                    <br>
+
+                    <span class="small">
+
+                        ${t.date}
+
+                        ·
+
+                        ${t.payment}
+
+                        ${
+                            t.note
+                            ?
+                            " · " +
+                            t.note
+                            :
+                            ""
+                        }
+
+                    </span>
+
+                </div>
+
+
+                <strong
+                    class="${
+                        t.type === "Income"
+                        ?
+                        "income"
+                        :
+                        "expense"
+                    }">
+
+                    ${
+                        t.type === "Income"
+                        ?
+                        "+"
+                        :
+                        "-"
+                    }
+
+                    ${money(
+                        t.amount
+                    )}
+
+                </strong>
+
+            </div>
+
+        </div>
+
+        `
+    )
+    .join("");
+
+}
+
+
+
+/* =========================
+   SAVE OPENING BALANCES
+========================= */
+
+function saveOpenings(){
+
+    opening = {
+
+        Cash:
+        +$("openCash").value || 0,
+
+        GPay:
+        +$("openGpay").value || 0,
+
+        Bank:
+        +$("openBank").value || 0,
+
+        Card:
+        +$("openCard").value || 0
+
+    };
+
+
+    localStorage.setItem(
+
+        "moneyTrackerOpening",
+
+        JSON.stringify(
+            opening
+        )
+
+    );
+
+
+    alert(
+        "Opening balances saved!"
+    );
+
+
+    page("home");
+
+}
+
+
+
+/* =========================
+   LOAD OPENINGS
+========================= */
+
+function loadOpenings(){
+
+    $("openCash").value =
+    opening.Cash;
+
+
+    $("openGpay").value =
+    opening.GPay;
+
+
+    $("openBank").value =
+    opening.Bank;
+
+
+    $("openCard").value =
+    opening.Card;
+
+}
+
+
+
+/* =========================
+   YEAR LIST
+========================= */
+
+(
+function(){
+
+    let year =
+    today.getFullYear();
+
+
+    for(
+        let i = year-5;
+        i <= year+5;
+        i++
+    ){
+
+        let option =
+        document.createElement(
+            "option"
+        );
+
+
+        option.value = i;
+
+        option.textContent = i;
+
+
+        if(
+            i === year
+        )
+            option.selected = true;
+
+
+        $("yearSelect")
+        .appendChild(
+            option
+        );
+
+    }
+
+
+    home();
+
+}
+)();
+
+</script>
+
+</body>
+</html>
