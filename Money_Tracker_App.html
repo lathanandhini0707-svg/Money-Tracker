@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Money Tracker</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#222}
+header{background:#1565c0;color:#fff;padding:15px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:20}
+header h2{margin:0;font-size:20px}
+.menu-btn{border:0;background:none;color:#fff;font-size:30px;cursor:pointer}
+.menu{display:none;position:absolute;right:12px;top:58px;background:#fff;color:#222;width:235px;border-radius:12px;box-shadow:0 5px 20px #999;overflow:hidden}
+.menu button{width:100%;border:0;background:#fff;padding:15px;text-align:left;font-size:16px}
+.menu button:hover{background:#eee}
+.container{max-width:620px;margin:auto;padding:16px}
+.page{display:none}.page.active{display:block}
+.card{background:#fff;border-radius:14px;padding:17px;margin-bottom:14px;box-shadow:0 2px 8px #ddd}
+.account{display:flex;justify-content:space-between;align-items:center}
+.account h3{margin:0 0 5px}.amount{font-size:23px;font-weight:bold}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:15px}
+.summary div{background:#fff;padding:14px 6px;text-align:center;border-radius:12px;box-shadow:0 2px 7px #ddd}
+.summary strong{display:block;margin-top:6px}
+label{display:block;font-weight:bold;margin:13px 0 6px}
+input,select,textarea{width:100%;padding:12px;border:1px solid #ccc;border-radius:9px;font-size:16px}
+textarea{min-height:70px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.choice{padding:12px;border:1px solid #bbb;border-radius:9px;background:#fff;cursor:pointer;font-size:15px}
+.choice.active{background:#1565c0;color:#fff;border-color:#1565c0}
+.save{width:100%;padding:14px;margin-top:18px;border:0;border-radius:9px;background:#1565c0;color:#fff;font-size:17px;font-weight:bold}
+.tx{padding:13px 0;border-bottom:1px solid #ddd;display:flex;justify-content:space-between;gap:10px}
+.income{color:green}.expense{color:#d32f2f}
+.small{font-size:13px;color:#666}.empty{text-align:center;color:#777;padding:25px}
+.danger{background:#d32f2f}
+</style>
+</head>
+<body>
+<header>
+<h2>💰 Money Tracker</h2>
+<button class="menu-btn" onclick="toggleMenu()">⋮</button>
+<div class="menu" id="menu">
+<button onclick="page('home')">🏠 Home</button>
+<button onclick="page('add')">➕ Add Transaction</button>
+<button onclick="page('monthly')">📅 Monthly Report</button>
+<button onclick="page('yearly')">📊 Yearly Report</button>
+<button onclick="page('history')">📜 Transaction History</button>
+<button onclick="page('accounts')">💰 Accounts</button>
+</div>
+</header>
+
+<main class="container">
+
+<section id="home" class="page active">
+<div class="card account"><div><h3>💵 Cash</h3><span class="small">Current Balance</span></div><div class="amount" id="cashBalance">₹0</div></div>
+<div class="card account"><div><h3>📲 GPay</h3><span class="small">Current Balance</span></div><div class="amount" id="gpayBalance">₹0</div></div>
+<div class="card account"><div><h3>🏦 Bank</h3><span class="small">Current Balance</span></div><div class="amount" id="bankBalance">₹0</div></div>
+<div class="card account"><div><h3>💳 Card</h3><span class="small">Current Balance</span></div><div class="amount" id="cardBalance">₹0</div></div>
+<h3 id="currentMonth"></h3>
+<div class="summary">
+<div>Income<strong id="income">₹0</strong></div>
+<div>Expense<strong id="expense">₹0</strong></div>
+<div>Balance<strong id="balance">₹0</strong></div>
+</div>
+<button class="save" onclick="page('add')">➕ ADD TRANSACTION</button>
+</section>
+
+<section id="add" class="page">
+<h2>➕ Add Transaction</h2>
+<div class="card">
+<label>Date</label>
+<input type="date" id="date">
+<label>Transaction Type</label>
+<div class="row">
+<button id="expenseBtn" class="choice active" onclick="setType('Expense')">💸 Expense</button>
+<button id="incomeBtn" class="choice" onclick="setType('Income')">💰 Income</button>
+</div>
+<label>Category</label>
+<select id="category">
+<option>Food</option><option>Petrol</option><option>Shopping</option><option>House</option>
+<option>EB / Electricity</option><option>Mobile</option><option>Medical</option>
+<option>Education</option><option>Travel</option><option>EMI</option>
+<option>Entertainment</option><option>Personal</option><option>Salary</option>
+<option>Other Income</option><option>Other</option>
+</select>
+<label>Payment Method</label>
+<div class="row">
+<button id="cashBtn" class="choice active" onclick="setPayment('Cash')">💵 Cash</button>
+<button id="gpayBtn" class="choice" onclick="setPayment('GPay')">📲 GPay</button>
+<button id="bankBtn" class="choice" onclick="setPayment('Bank')">🏦 Bank</button>
+<button id="cardBtn" class="choice" onclick="setPayment('Card')">💳 Card</button>
+</div>
+<label>Amount</label>
+<input type="number" id="amount" min="0" step="0.01" placeholder="Enter amount">
+<label>Note (optional)</label>
+<textarea id="note" placeholder="What was this money for?"></textarea>
+<button class="save" onclick="saveTx()">💾 SAVE TRANSACTION</button>
+</div>
+</section>
+
+<section id="monthly" class="page">
+<h2>📅 Monthly Report</h2>
+<div class="card"><label>Select Month</label><input type="month" id="monthSelect" onchange="monthlyReport()"></div>
+<div id="monthlyResult"></div>
+</section>
+
+<section id="yearly" class="page">
+<h2>📊 Yearly Report</h2>
+<div class="card"><label>Select Year</label><select id="yearSelect" onchange="yearlyReport()"></select></div>
+<div id="yearlyResult"></div>
+</section>
+
+<section id="history" class="page">
+<h2>📜 Transaction History</h2>
+<div id="historyList"></div>
+</section>
+
+<section id="accounts" class="page">
+<h2>💰 Accounts</h2>
+<div class="card">
+<label>💵 Cash Opening Balance</label><input type="number" id="openCash">
+<label>📲 GPay Opening Balance</label><input type="number" id="openGpay">
+<label>🏦 Bank Opening Balance</label><input type="number" id="openBank">
+<label>💳 Card Opening Balance</label><input type="number" id="openCard">
+<button class="save" onclick="saveOpenings()">💾 SAVE OPENING BALANCES</button>
+</div>
+</section>
+
+</main>
+
+<script>
+let tx=JSON.parse(localStorage.getItem("moneyTrackerTx")||"[]");
+let opening=JSON.parse(localStorage.getItem("moneyTrackerOpening")||'{"Cash":0,"GPay":0,"Bank":0,"Card":0}');
+let type="Expense", payment="Cash";
+
+const $=id=>document.getElementById(id);
+const today=new Date();
+$("date").value=today.toISOString().slice(0,10);
+$("monthSelect").value=today.toISOString().slice(0,7);
+
+function money(n){return "₹"+Number(n).toLocaleString("en-IN",{maximumFractionDigits:2})}
+function toggleMenu(){let m=$("menu");m.style.display=m.style.display==="block"?"none":"block"}
+function page(id){
+document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+$(id).classList.add("active");$("menu").style.display="none";
+if(id==="home")home(); if(id==="monthly")monthlyReport(); if(id==="yearly")yearlyReport(); if(id==="history")historyReport(); if(id==="accounts")loadOpenings();
+}
+function setType(v){type=v;$("expenseBtn").classList.toggle("active",v==="Expense");$("incomeBtn").classList.toggle("active",v==="Income")}
+function setPayment(v){
+payment=v;
+["Cash","GPay","Bank","Card"].forEach(a=>$(a.toLowerCase()+"Btn").classList.toggle("active",a===v));
+}
+function saveTx(){
+let amount=parseFloat($("amount").value);
+if(!amount||amount<=0){alert("Please enter amount");return}
+tx.push({id:Date.now(),date:$("date").value,type,category:$("category").value,payment,amount,note:$("note").value});
+localStorage.setItem("moneyTrackerTx",JSON.stringify(tx));
+$("amount").value="";$("note").value="";
+alert("Transaction saved!");
+page("home");
+}
+function acc(a){
+let n=Number(opening[a]||0);
+tx.forEach(t=>{if(t.payment===a)n+=t.type==="Income"?Number(t.amount):-Number(t.amount)});
+return n;
+}
+function home(){
+$("cashBalance").textContent=money(acc("Cash"));$("gpayBalance").textContent=money(acc("GPay"));
+$("bankBalance").textContent=money(acc("Bank"));$("cardBalance").textContent=money(acc("Card"));
+$("currentMonth").textContent=today.toLocaleString("en-IN",{month:"long",year:"numeric"});
+let key=today.toISOString().slice(0,7), list=tx.filter(t=>t.date.startsWith(key));
+let inc=list.filter(t=>t.type==="Income").reduce((a,t)=>a+t.amount,0);
+let exp=list.filter(t=>t.type==="Expense").reduce((a,t)=>a+t.amount,0);
+$("income").textContent=money(inc);$("expense").textContent=money(exp);$("balance").textContent=money(inc-exp);
+}
+function report(list,target,title){
+let inc=list.filter(t=>t.type==="Income").reduce((a,t)=>a+t.amount,0);
+let exp=list.filter(t=>t.type==="Expense").reduce((a,t)=>a+t.amount,0);
+let cats={}, pays={};
+list.filter(t=>t.type==="Expense").forEach(t=>{cats[t.category]=(cats[t.category]||0)+t.amount;pays[t.payment]=(pays[t.payment]||0)+t.amount});
+let html='<div class="summary"><div>Income<strong>'+money(inc)+'</strong></div><div>Expense<strong>'+money(exp)+'</strong></div><div>Balance<strong>'+money(inc-exp)+'</strong></div></div>';
+html+='<div class="card"><h3>Category-wise Expense</h3>';
+Object.keys(cats).forEach(k=>html+='<div class="tx"><span>'+k+'</span><strong>'+money(cats[k])+'</strong></div>');
+html+='</div><div class="card"><h3>Payment-wise Expense</h3>';
+Object.keys(pays).forEach(k=>html+='<div class="tx"><span>'+k+'</span><strong>'+money(pays[k])+'</strong></div>');
+html+='</div>';
+$(target).innerHTML=html;
+}
+function monthlyReport(){let k=$("monthSelect").value;report(tx.filter(t=>t.date.startsWith(k)),"monthlyResult","Monthly")}
+function yearlyReport(){let y=$("yearSelect").value;report(tx.filter(t=>t.date.startsWith(y)),"yearlyResult","Yearly")}
+function historyReport(){
+let list=[...tx].reverse();
+$("historyList").innerHTML=list.length?list.map(t=>'<div class="card"><div class="tx"><div><b>'+t.category+'</b><br>'+t.date+'<br>'+t.payment+(t.note?'<br>'+t.note:'')+'</div><strong class="'+(t.type==="Income"?"income":"expense")+'">'+(t.type==="Income"?"+":"-")+money(t.amount)+'</strong></div></div>').join(""):'<div class="empty">No transactions yet.</div>';
+}
+function saveOpenings(){
+opening={Cash:+$("openCash").value||0,GPay:+$("openGpay").value||0,Bank:+$("openBank").value||0,Card:+$("openCard").value||0};
+localStorage.setItem("moneyTrackerOpening",JSON.stringify(opening));alert("Opening balances saved!");page("home");
+}
+function loadOpenings(){$("openCash").value=opening.Cash;$("openGpay").value=opening.GPay;$("openBank").value=opening.Bank;$("openCard").value=opening.Card}
+(function(){
+let y=new Date().getFullYear();
+for(let i=y-5;i<=y+5;i++){let o=document.createElement("option");o.value=i;o.textContent=i;if(i===y)o.selected=true;$("yearSelect").appendChild(o)}
+home();
+})();
+</script>
+</body>
+</html>
