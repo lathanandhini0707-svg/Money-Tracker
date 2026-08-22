@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ta">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#6d28d9">
+<title>Veettu Budget Manager</title>
+<style>
+:root{--p:#6d28d9;--p2:#9333ea;--bg:#f6f4fb;--card:#fff;--text:#211b2d;--muted:#756d82;--green:#16845b;--red:#d83b55;--line:#e8e2ef}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#f4efff,#faf9fc);font-family:system-ui,-apple-system,"Noto Sans Tamil",sans-serif;color:var(--text)}
+header{background:linear-gradient(135deg,var(--p),var(--p2));color:white;padding:22px 16px 28px;border-radius:0 0 28px 28px;box-shadow:0 8px 25px #6d28d933}
+h1{font-size:24px;margin:0 0 5px}.sub{opacity:.9;font-size:13px}.wrap{max-width:760px;margin:auto;padding:14px}
+.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:-18px}.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:15px;box-shadow:0 5px 18px #3020400d}.label{font-size:12px;color:var(--muted)}.amount{font-size:21px;font-weight:800;margin-top:5px}
+.tabs{display:flex;gap:7px;overflow:auto;margin:15px 0}.tab{border:0;background:#eee9f7;color:#4d425a;padding:10px 13px;border-radius:12px;white-space:nowrap;font-weight:700}.tab.active{background:var(--p);color:white}
+.panel{display:none}.panel.active{display:block}.section{margin-bottom:14px}.section h2{font-size:17px;margin:7px 2px 10px}
+form,.box{background:white;border:1px solid var(--line);border-radius:18px;padding:14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px}input,select,textarea{width:100%;padding:11px;border:1px solid #ddd5e7;border-radius:11px;background:#fff;font:inherit;color:var(--text)}textarea{min-height:70px}.full{grid-column:1/-1}
+button{cursor:pointer;border:0;border-radius:11px;padding:11px 14px;font-weight:800}.primary{background:var(--p);color:white}.secondary{background:#eee9f7;color:#493c56}.danger{background:#ffe7eb;color:#b5223b}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.list{display:grid;gap:9px;margin-top:10px}.row{background:white;border:1px solid var(--line);border-radius:15px;padding:12px;display:flex;justify-content:space-between;gap:10px}.row strong{display:block}.meta{font-size:12px;color:var(--muted);margin-top:3px}.right{text-align:right}.green{color:var(--green)}.red{color:var(--red)}
+.progress{height:9px;background:#eee9f7;border-radius:99px;overflow:hidden;margin-top:8px}.bar{height:100%;background:linear-gradient(90deg,var(--p),#c026d3)}
+.empty{text-align:center;color:var(--muted);padding:22px}.small{font-size:11px;color:var(--muted)}.footer{text-align:center;color:var(--muted);padding:25px 5px;font-size:11px}
+@media(min-width:650px){.cards{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><h1>🏠 வீட்டு பட்ஜெட் மேனேஜர்</h1><div class="sub">வரவு • செலவு • EMI • சேமிப்பு — அனைத்தும் ஒரே இடத்தில்</div></div></header>
+<main class="wrap">
+<div class="cards">
+<div class="card"><div class="label">இந்த மாத வரவு</div><div class="amount" id="incomeTotal">₹0</div></div>
+<div class="card"><div class="label">இந்த மாத செலவு</div><div class="amount" id="expenseTotal">₹0</div></div>
+<div class="card"><div class="label">EMI / கடன் கட்டணம்</div><div class="amount" id="emiTotal">₹0</div></div>
+<div class="card"><div class="label">மீதம்</div><div class="amount" id="balanceTotal">₹0</div></div>
+</div>
+
+<div class="tabs">
+<button class="tab active" onclick="showTab('dashboard',this)">📊 Dashboard</button>
+<button class="tab" onclick="showTab('expense',this)">🧾 செலவுகள்</button>
+<button class="tab" onclick="showTab('income',this)">💰 வரவு</button>
+<button class="tab" onclick="showTab('loan',this)">🏦 EMI / கடன்</button>
+<button class="tab" onclick="showTab('saving',this)">🐷 சேமிப்பு</button>
+<button class="tab" onclick="showTab('reports',this)">📥 Reports</button>
+</div>
+
+<section id="dashboard" class="panel active">
+<div class="section"><h2>இந்த மாத சுருக்கம்</h2><div class="box">
+<div>செலவு பயன்பாடு <b id="expensePct">0%</b></div><div class="progress"><div class="bar" id="expenseBar" style="width:0%"></div></div>
+<div class="actions"><button class="secondary" onclick="exportData()">📤 Backup JSON</button><button class="secondary" onclick="document.getElementById('importFile').click()">📥 Restore</button><input id="importFile" type="file" accept=".json" style="display:none" onchange="importData(event)"></div>
+<div class="small" style="margin-top:10px">தகவல்கள் இந்த browser-ல் சேமிக்கப்படும். Backup எடுத்து வைத்துக்கொள்ளவும்.</div>
+</div></div>
+<div class="section"><h2>சமீபத்திய பதிவுகள்</h2><div id="recent" class="list"></div></div>
+</section>
+
+<section id="expense" class="panel">
+<div class="section"><h2>புதிய செலவு</h2><form onsubmit="addExpense(event)"><div class="grid">
+<div><label>தேதி</label><input id="exDate" type="date" required></div>
+<div><label>தொகை (₹)</label><input id="exAmount" type="number" min="0" step="0.01" required></div>
+<div><label>வகை</label><select id="exCat"><option>மளிகை</option><option>காய்கறி / உணவு</option><option>மின்சாரம்</option><option>தண்ணீர்</option><option>பால்</option><option>மருத்துவம்</option><option>பயணம்</option><option>குழந்தைகள்</option><option>வீட்டு பராமரிப்பு</option><option>Shopping</option><option>மற்றவை</option></select></div>
+<div><label>Payment Mode</label><select id="exMode"><option>Cash</option><option>GPay / UPI</option><option>PhonePe / UPI</option><option>Card</option><option>Bank Transfer</option><option>Other</option></select></div>
+<div class="full"><label>விவரம்</label><input id="exNote" placeholder="எ.கா. மாத grocery"></div>
+</div><div class="actions"><button class="primary">+ செலவு சேமிக்க</button></div></form></div>
+<div id="expenseList" class="list"></div>
+</section>
+
+<section id="income" class="panel">
+<div class="section"><h2>வரவு பதிவு</h2><form onsubmit="addIncome(event)"><div class="grid">
+<div><label>தேதி</label><input id="inDate" type="date" required></div><div><label>தொகை (₹)</label><input id="inAmount" type="number" min="0" step="0.01" required></div>
+<div><label>வகை</label><select id="inCat"><option>Salary</option><option>Business</option><option>Other Income</option><option>Gift</option><option>Refund</option></select></div>
+<div><label>பெற்ற விதம்</label><select id="inMode"><option>Bank</option><option>Cash</option><option>GPay / UPI</option><option>Other</option></select></div>
+<div class="full"><label>விவரம்</label><input id="inNote" placeholder="எ.கா. மாத சம்பளம்"></div>
+</div><div class="actions"><button class="primary">+ வரவு சேமிக்க</button></div></form></div>
+<div id="incomeList" class="list"></div>
+</section>
+
+<section id="loan" class="panel">
+<div class="section"><h2>கடன் / EMI பதிவு</h2><form onsubmit="addLoan(event)"><div class="grid">
+<div class="full"><label>கடன் பெயர்</label><input id="loanName" placeholder="எ.கா. Home Loan" required></div>
+<div><label>மொத்த கடன் (₹)</label><input id="loanPrincipal" type="number" required></div><div><label>Interest Rate (% வருடத்திற்கு)</label><input id="loanRate" type="number" step="0.01" required></div>
+<div><label>EMI (₹)</label><input id="loanEmi" type="number" required></div><div><label>EMI Due Date</label><input id="loanDue" type="date" required></div>
+<div><label>இதுவரை செலுத்திய மொத்தம் (₹)</label><input id="loanPaid" type="number" value="0"></div><div><label>இதுவரை Interest (₹)</label><input id="loanInterest" type="number" value="0"></div>
+<div><label>இதுவரை Principal / அசல் (₹)</label><input id="loanPrincipalPaid" type="number" value="0"></div><div><label>அடுத்த EMI தேதி</label><input id="loanNext" type="date"></div>
+<div class="full"><label>குறிப்பு</label><input id="loanNote" placeholder="Bank / lender details"></div>
+</div><div class="actions"><button class="primary">+ கடன் சேமிக்க</button></div></form></div>
+<div id="loanList" class="list"></div>
+</section>
+
+<section id="saving" class="panel">
+<div class="section"><h2>சேமிப்பு இலக்கு</h2><form onsubmit="addSaving(event)"><div class="grid">
+<div><label>இலக்கு பெயர்</label><input id="svName" placeholder="Emergency Fund" required></div><div><label>இலக்கு தொகை (₹)</label><input id="svTarget" type="number" required></div>
+<div><label>இதுவரை சேமிப்பு (₹)</label><input id="svSaved" type="number" value="0"></div><div><label>Due Date</label><input id="svDue" type="date"></div>
+</div><div class="actions"><button class="primary">+ இலக்கு சேமிக்க</button></div></form></div>
+<div id="savingList" class="list"></div>
+</section>
+
+<section id="reports" class="panel">
+<div class="section"><h2>Reports & Data</h2><div class="box">
+<label>Report Month</label><input id="reportMonth" type="month" onchange="render()">
+<div class="actions"><button class="primary" onclick="downloadCSV()">📥 CSV Download</button><button class="secondary" onclick="window.print()">🖨️ Print / PDF</button><button class="danger" onclick="clearAll()">Delete All Data</button></div>
+</div></div>
+</section>
+<div class="footer">Veettu Budget Manager • Offline-first personal budget tracker</div>
+</main>
+<script>
+const KEY='veettuBudgetV1';
+let db=JSON.parse(localStorage.getItem(KEY)||'{"expenses":[],"incomes":[],"loans":[],"savings":[]}');
+const today=new Date().toISOString().slice(0,10);
+['exDate','inDate'].forEach(x=>document.getElementById(x).value=today);
+document.getElementById('reportMonth').value=today.slice(0,7);
+function save(){localStorage.setItem(KEY,JSON.stringify(db));render()}
+function money(n){return '₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2})}
+function showTab(id,btn){document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');render()}
+function month(){return document.getElementById('reportMonth').value||today.slice(0,7)}
+function addExpense(e){e.preventDefault();db.expenses.unshift({id:Date.now(),date:exDate.value,amount:+exAmount.value,cat:exCat.value,mode:exMode.value,note:exNote.value});e.target.reset();exDate.value=today;save()}
+function addIncome(e){e.preventDefault();db.incomes.unshift({id:Date.now(),date:inDate.value,amount:+inAmount.value,cat:inCat.value,mode:inMode.value,note:inNote.value});e.target.reset();inDate.value=today;save()}
+function addLoan(e){e.preventDefault();db.loans.unshift({id:Date.now(),name:loanName.value,total:+loanPrincipal.value,rate:+loanRate.value,emi:+loanEmi.value,due:loanDue.value,paid:+loanPaid.value,interest:+loanInterest.value,principalPaid:+loanPrincipalPaid.value,next:loanNext.value,note:loanNote.value});e.target.reset();save()}
+function addSaving(e){e.preventDefault();db.savings.unshift({id:Date.now(),name:svName.value,target:+svTarget.value,saved:+svSaved.value,due:svDue.value});e.target.reset();save()}
+function del(type,id){db[type]=db[type].filter(x=>x.id!==id);save()}
+function item(x,type){let title=x.note||x.cat||x.name||'Entry';let val=x.amount??x.emi??x.saved??0;return `<div class="row"><div><strong>${esc(title)}</strong><div class="meta">${x.date||x.due||''} ${x.mode?'• '+esc(x.mode):''}</div></div><div class="right"><b class="${type==='expense'?'red':'green'}">${type==='expense'?'-':''}${money(val)}</b><br><button class="danger" onclick="del('${type}',${x.id})">Delete</button></div></div>`}
+function render(){let m=month(), ex=db.expenses.filter(x=>x.date.startsWith(m)), inc=db.incomes.filter(x=>x.date.startsWith(m));let et=ex.reduce((a,x)=>a+x.amount,0), it=inc.reduce((a,x)=>a+x.amount,0), emi=db.loans.reduce((a,x)=>a+x.emi,0);incomeTotal.textContent=money(it);expenseTotal.textContent=money(et);emiTotal.textContent=money(emi);balanceTotal.textContent=money(it-et-emi);let pct=it?Math.min(100,et/it*100):0;expensePct.textContent=pct.toFixed(0)+'%';expenseBar.style.width=pct+'%';
+expenseList.innerHTML=ex.length?ex.map(x=>item(x,'expense')).join(''):'<div class="empty">இந்த மாத செலவுகள் இல்லை</div>';
+incomeList.innerHTML=inc.length?inc.map(x=>item(x,'income')).join(''):'<div class="empty">இந்த மாத வரவுகள் இல்லை</div>';
+loanList.innerHTML=db.loans.length?db.loans.map(x=>`<div class="row"><div><strong>🏦 ${esc(x.name)}</strong><div class="meta">மொத்தம் ${money(x.total)} • Interest ${x.rate}% • அடுத்த EMI ${x.next||x.due}</div><div class="meta">Paid ${money(x.paid)} | Principal ${money(x.principalPaid)} | Interest ${money(x.interest)} | Remaining ${money(Math.max(0,x.total-x.principalPaid))}</div></div><div class="right"><b>${money(x.emi)}/month</b><br><button class="danger" onclick="del('loans',${x.id})">Delete</button></div></div>`).join(''):'<div class="empty">கடன் பதிவு இல்லை</div>';
+savingList.innerHTML=db.savings.length?db.savings.map(x=>{let p=x.target?Math.min(100,x.saved/x.target*100):0;return `<div class="row"><div style="width:100%"><strong>🐷 ${esc(x.name)}</strong><div class="meta">${money(x.saved)} / ${money(x.target)} ${x.due?'• '+x.due:''}</div><div class="progress"><div class="bar" style="width:${p}%"></div></div></div><div><button class="danger" onclick="del('savings',${x.id})">Delete</button></div></div>`}).join(''):'<div class="empty">சேமிப்பு இலக்கு இல்லை</div>';
+let all=[...db.expenses.map(x=>({...x,t:'expense'})),...db.incomes.map(x=>({...x,t:'income'}))].sort((a,b)=>b.id-a.id).slice(0,8);recent.innerHTML=all.length?all.map(x=>item(x,x.t)).join(''):'<div class="empty">பதிவுகள் இல்லை</div>'}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function exportData(){let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='veettu-budget-backup.json';a.click()}
+function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{db=JSON.parse(r.result);save();alert('Backup restored');}catch{alert('Invalid backup file')}};r.readAsText(f)}
+function downloadCSV(){let rows=[['Type','Date','Category/Name','Amount','Payment Mode','Note'],...db.expenses.map(x=>['Expense',x.date,x.cat,x.amount,x.mode,x.note]),...db.incomes.map(x=>['Income',x.date,x.cat,x.amount,x.mode,x.note])];let csv=rows.map(r=>r.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='veettu-budget-report.csv';a.click()}
+function clearAll(){if(confirm('அனைத்து தகவல்களையும் அழிக்கவா?')){db={expenses:[],incomes:[],loans:[],savings:[]};save()}}
+render();
+</script>
+</body></html>
