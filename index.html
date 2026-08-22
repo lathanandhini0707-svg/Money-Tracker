@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#5b3cc4">
+<title>Household Money Tracker</title>
+<style>
+:root{--p:#0f766e;--p2:#14b8a6;--bg:#eef7f6;--card:#fff;--txt:#173042;--muted:#667984;--line:#d9e9e7;--green:#11865b;--red:#d9485f;--amber:#d97706;--shadow:0 8px 24px #17304214}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Arial,system-ui,sans-serif;color:var(--txt)}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}
+.top{background:linear-gradient(135deg,#0b3b45,var(--p),var(--p2));color:white;padding:22px 16px 30px;border-radius:0 0 24px 24px}.wrap{max-width:1280px;margin:auto;padding:14px 18px;margin-left:230px}.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-size:25px;font-weight:800}.sub{opacity:.9;font-size:13px;margin-top:4px}.menu{font-size:26px;background:#ffffff20;color:#fff;width:45px;height:45px;border-radius:12px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:-17px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;box-shadow:var(--shadow)}.label{font-size:12px;color:var(--muted)}.amt{font-size:21px;font-weight:800;margin-top:5px}
+.nav{position:fixed;left:12px;top:120px;width:200px;display:grid;gap:7px;margin:0;z-index:8;max-height:calc(100vh - 140px);overflow:auto;background:#fff;padding:10px;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}.nav button{padding:12px 14px;border-radius:11px;background:#e7f3f1;color:#285b59;color:#285b59;font-weight:800;text-align:left;white-space:nowrap}.nav button.active{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff}
+.page{display:none}.page.active{display:block}.box{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 3px 15px #33205208}h2{font-size:21px;margin:0 0 12px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px}input,select,textarea{width:100%;min-height:46px;padding:12px;border:1px solid #ddd5e8;border-radius:11px;background:#fff;color:var(--txt)}textarea{min-height:80px}.full{grid-column:1/-1}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.primary{background:var(--p);color:#fff;padding:11px 15px;border-radius:11px;font-weight:700}.secondary{background:#ece7f5;color:#493c58;padding:11px 15px;border-radius:11px;font-weight:700}.danger{background:#ffe6eb;color:#b3233d;padding:9px 12px;border-radius:10px;font-weight:700}.success{background:#e4f7ef;color:#14724f;padding:9px 12px;border-radius:10px;font-weight:700}
+.list{display:grid;gap:9px}.row{background:#fff;border:1px solid var(--line);border-radius:15px;padding:13px;display:flex;justify-content:space-between;gap:12px}.meta{font-size:12px;color:var(--muted);margin-top:4px}.right{text-align:right}.green{color:var(--green)}.red{color:var(--red)}.amber{color:var(--amber)}
+.progress{height:9px;background:#eee9f5;border-radius:99px;overflow:hidden;margin-top:8px}.bar{height:100%;background:linear-gradient(90deg,var(--p),#c35ce0)}.pill{display:inline-block;padding:5px 9px;border-radius:99px;font-size:11px;font-weight:700;background:#eee9f5;margin:2px}.due{background:#fff0d4;color:#9a6100}.empty{text-align:center;color:var(--muted);padding:25px}.small{font-size:11px;color:var(--muted)}.side{position:fixed;right:14px;top:78px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:8px;box-shadow:var(--shadow);display:none;z-index:5}.side.show{display:block}.side button{display:block;background:#fff;padding:11px 14px;text-align:left;width:190px;border-radius:9px}.side button:hover{background:#f3eff9}.footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
+@media(max-width:900px){.wrap{margin-left:0}.nav{position:static;width:100%;display:flex;overflow:auto;margin:15px 0;max-height:none}.nav button{text-align:center}.top{padding-top:16px}}@media(max-width:700px){.cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.full{grid-column:auto}}@media(print){.top{border-radius:0}.nav,.menu,.actions,.side{display:none!important}.page{display:none!important}.page.active{display:block!important}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><div class="topbar"><div><div class="brand">🏠 Household Money Tracker</div><div class="sub">Daily • Weekly • Monthly • Yearly household finance management</div></div><button class="menu" onclick="toggleMenu()">⋮</button></div></div></header>
+<div id="side" class="side">
+<button onclick="go('dashboard')">🏠 Home</button><button onclick="go('daily')">📅 Daily</button><button onclick="go('monthly')">📊 Monthly</button><button onclick="go('weekly')">📈 Weekly Report</button><button onclick="go('yearly')">📋 Yearly Report</button><button onclick="go('share')">📤 Share & Backup</button>
+</div>
+<main class="wrap">
+<div class="cards">
+<div class="card"><div class="label">Monthly Income</div><div class="amt" id="salaryTotal">₹0</div></div>
+<div class="card"><div class="label">Daily Income</div><div class="amt" id="extraIncomeTotal">₹0</div></div>
+<div class="card"><div class="label">Total Expenses</div><div class="amt" id="expenseTotal">₹0</div></div>
+<div class="card"><div class="label">Balance</div><div class="amt" id="balanceTotal">₹0</div></div>
+</div>
+<div class="nav">
+<button class="active" onclick="show('dashboard',this)">Dashboard</button><button onclick="show('daily',this)">Daily Entries</button><button onclick="show('income',this)">Income</button><button onclick="show('monthly',this)">Monthly Budget</button><button onclick="show('loans',this)">Loans & EMI</button><button onclick="show('recharges',this)">Recharges</button><button onclick="show('reports',this)">Reports</button><button onclick="show('share',this)">Share & Backup</button>
+</div>
+
+<section id="dashboard" class="page active">
+<div class="box"><h2>Dashboard</h2><div class="grid">
+<div><label>Dashboard Month</label><input id="dashMonth" type="month"></div>
+<div><label>Monthly Budget Limit</label><input id="dashBudget" type="number" min="0" placeholder="Optional"></div>
+</div><div class="actions"><button class="primary" onclick="saveSettings()">Save Dashboard Settings</button></div></div>
+<div class="box"><h2>Budget Health</h2><div>Expense usage: <b id="pct">0%</b></div><div class="progress"><div id="bar" class="bar" style="width:0"></div></div><div id="health" class="small" style="margin-top:8px"></div></div>
+<div class="box"><h2>Income Source Balance</h2><p>Monthly Income: <b id="monthlySourceBalance">₹0</b> • Spent: <b id="monthlySourceSpent">₹0</b></p><p>Daily Income: <b id="dailySourceBalance">₹0</b> • Spent: <b id="dailySourceSpent">₹0</b></p></div><h2>Upcoming Due Dates</h2><div id="dueList" class="list"></div>
+<h2 style="margin-top:16px">Recent Activity</h2><div id="recent" class="list"></div>
+</section>
+
+<section id="daily" class="page">
+<div class="box"><h2>Add Daily Expense</h2><form onsubmit="addExpense(event)"><div class="grid">
+<div><label>Date</label><input id="eDate" type="date" required></div><div><label>Amount (₹)</label><input id="eAmount" type="number" min="0" step=".01" required></div>
+<div><label>Expense Category</label><select id="eCat"><option>Groceries</option><option>Vegetables & Food</option><option>Milk</option><option>Electricity</option><option>Water</option><option>LPG / Gas</option><option>Medical</option><option>Transport</option><option>Children</option><option>House Maintenance</option><option>Rent</option><option>Shopping</option><option>Entertainment</option><option>School / Education</option><option>Insurance</option><option>Subscriptions</option><option>Mobile / Internet</option><option>Gifts</option><option>Other</option></select></div>
+<div><label>Expense Taken From</label><select id="eSource"><option>Monthly Income</option><option>Daily Income</option></select></div>
+<div><label>Payment Method</label><select id="eMode"><option>Cash</option><option>GPay / UPI</option><option>PhonePe / UPI</option><option>Paytm / UPI</option><option>Debit Card</option><option>Credit Card</option><option>Bank Transfer</option><option>Other</option></select></div>
+<div class="full"><label>Paid By / Person</label><input id="ePerson" placeholder="Example: Me / Husband"></div><div class="full"><label>Description</label><input id="eNote" placeholder="What was purchased?"></div>
+</div><div class="actions"><button class="primary">Save Expense</button></div></form></div>
+<div class="box"><h2>Daily Daily Income</h2><form onsubmit="addExtra(event)"><div class="grid">
+<div><label>Date</label><input id="xDate" type="date" required></div><div><label>Daily Income Amount (₹)</label><input id="xAmount" type="number" min="0" step=".01" required></div>
+<div><label>Income Source</label><select id="xCat"><option>Side Income</option><option>Business</option><option>Commission</option><option>Gift</option><option>Refund</option><option>Other</option></select></div><div><label>Received Through</label><select id="xMode"><option>Cash</option><option>GPay / UPI</option><option>PhonePe / UPI</option><option>Bank Transfer</option><option>Other</option></select></div>
+<div class="full"><label>Description</label><input id="xNote" placeholder="Example: Extra income received today"></div></div><div class="actions"><button class="primary">Save Daily Income</button></div></form></div>
+<h2>Today's / Selected Month Transactions</h2><div id="dailyList" class="list"></div>
+</section>
+
+<section id="income" class="page"><div class="box"><h2>Income</h2><div class="income-columns"><div class="income-card"><h3>Monthly Income</h3><form onsubmit="addMonthlyIncome(event)"><div class="grid"><div><label>Month</label><input id="miMonth" type="month" required></div><div><label>Monthly Income (₹)</label><input id="miAmount" type="number" min="0" required></div><div><label>Amount Taken / Used (₹)</label><input id="miUsed" type="number" min="0" value="0"></div><div class="full"><label>Note</label><input id="miNote" placeholder="Salary / regular monthly income"></div></div><div class="actions"><button class="primary">Save Monthly Income</button></div></form><div class="meta">Received: <b id="miReceived">₹0</b> • Used: <b id="miUsedTotal">₹0</b> • Remaining: <b id="miRemaining">₹0</b></div></div><div class="income-card"><h3>Daily Income</h3><form onsubmit="addDailyIncome(event)"><div class="grid"><div><label>Date</label><input id="diDate" type="date" required></div><div><label>Daily Income (₹)</label><input id="diAmount" type="number" min="0" required></div><div><label>Income Source</label><select id="diSource"><option>Side Income</option><option>Business</option><option>Commission</option><option>Gift</option><option>Refund</option><option>Other</option></select></div><div><label>Received Through</label><select id="diMode"><option>Cash</option><option>GPay / UPI</option><option>PhonePe / UPI</option><option>Bank Transfer</option><option>Other</option></select></div><div class="full"><label>Note</label><input id="diNote" placeholder="Extra income received today"></div></div><div class="actions"><button class="primary">Save Daily Income</button></div></form><div class="meta">Received: <b id="diReceived">₹0</b> • Spent: <b id="diSpent">₹0</b> • Remaining: <b id="diRemaining">₹0</b></div></div></div></div><div class="box"><h2>Income History</h2><div id="incomeList" class="list"></div></div></section>
+<section id="monthly" class="page">
+<div class="box"><h2>Monthly Budget & Salary</h2><form onsubmit="addMonthly(event)"><div class="grid">
+<div><label>Month</label><input id="mMonth" type="month" required></div><div><label>Monthly Income (₹)</label><input id="mSalary" type="number" min="0" required></div>
+<div><label>Salary Amount Withdrawn / Used (₹)</label><input id="mUsed" type="number" min="0" value="0"></div><div><label>Monthly Budget Limit (₹)</label><input id="mBudget" type="number" min="0" value="0"></div>
+<div class="full"><label>Notes</label><input id="mNote" placeholder="Example: Salary received for this month"></div></div><div class="actions"><button class="primary">Save Monthly Income</button></div></form></div>
+<div id="monthlyList" class="list"></div>
+</section>
+
+<section id="loans" class="page">
+<div class="box"><h2>Loan / EMI Account</h2><form onsubmit="addLoan(event)"><div class="grid">
+<div class="full"><label>Lender / Bank / Person Name</label><input id="lName" required placeholder="Example: ABC Bank"></div>
+<div><label>Overall Loan Amount (₹)</label><input id="lTotal" type="number" min="0" required></div>
+<div><label>Monthly Interest Amount (₹)</label><input id="lMonthlyInterest" type="number" min="0" step=".01" required placeholder="Example: 1,500"></div>
+<div><label>Monthly EMI / Payment (₹)</label><input id="lEmi" type="number" min="0" required></div>
+<div><label>Loan Start Date</label><input id="lStart" type="date" required></div>
+<div><label>Principal Paid So Far (₹)</label><input id="lPrincipal" type="number" min="0" value="0"></div>
+<div><label>Interest Paid So Far (₹)</label><input id="lInterest" type="number" min="0" value="0"></div>
+<div><label>Next EMI Date</label><input id="lNext" type="date"></div>
+<div class="full"><label>Notes</label><textarea id="lNote" placeholder="Loan details"></textarea></div></div>
+<p class="small">Enter the overall amount, monthly interest amount and monthly payment. When you record a payment, the app automatically calculates that month's interest, principal and remaining balance.</p><div class="actions"><button class="primary">Save Loan</button></div></form></div>
+<div class="box"><h2>Record EMI Payment</h2><form onsubmit="payLoan(event)"><div class="grid">
+<div><label>Select Loan</label><select id="pLoan"></select></div><div><label>Payment Date</label><input id="pDate" type="date" required></div>
+<div><label>Amount Paid This Month (₹)</label><input id="pAmount" type="number" min="0" required placeholder="Example: 15,000"></div>
+<div><label>Interest This Month (Auto)</label><input id="pInterest" type="number" readonly></div>
+<div><label>Principal This Month (Auto)</label><input id="pPrincipal" type="number" readonly></div>
+<div><label>Remaining Balance (Auto)</label><input id="pRemaining" type="number" readonly></div>
+<div class="full"><label>Reference / Note</label><input id="pNote"></div>
+</div><div class="actions"><button class="primary">Save EMI Payment</button></div></form></div>
+<div id="loanList" class="list"></div>
+</section>
+
+<section id="recharges" class="page">
+<div class="box"><h2>Mobile Recharge Tracker</h2><form onsubmit="addRecharge(event)"><div class="grid">
+<div><label>Person Name</label><input id="rPerson" required placeholder="Example: My Mobile"></div><div><label>Mobile Number</label><input id="rMobile" placeholder="Optional"></div>
+<div><label>Operator</label><select id="rOperator"><option>Jio</option><option>Airtel</option><option>Vi</option><option>BSNL</option><option>Other</option></select></div>
+<div><label>Recharge Date</label><input id="rDate" type="date" required></div>
+<div><label>Recharge Amount (₹)</label><input id="rAmount" type="number" min="0" required></div><div><label>Validity (Days)</label><input id="rDays" type="number" min="1" required placeholder="Example: 28"></div>
+<div><label>Payment Method</label><select id="rMode"><option>GPay / UPI</option><option>Cash</option><option>Card</option><option>Bank</option><option>Other</option></select></div>
+<div class="full"><label>Notes</label><input id="rNote"></div></div><div class="actions"><button class="primary">Save Recharge</button></div></form></div>
+<div id="rechargeList" class="list"></div>
+</section>
+
+<section id="reports" class="page">
+<div class="box"><h2>Reports & Downloads</h2><div class="grid">
+<div><label>Report Month</label><input id="reportMonth" type="month"></div><div><label>Report Year</label><input id="reportYear" type="number" min="2000" max="2100"></div></div>
+<div class="actions"><button class="primary" onclick="downloadCSV('monthly')">Download Monthly Excel CSV</button><button class="secondary" onclick="downloadCSV('weekly')">Download Weekly CSV</button><button class="secondary" onclick="downloadCSV('yearly')">Download Yearly CSV</button><button class="secondary" onclick="window.print()">Print / Save PDF</button></div>
+<p class="small">CSV files open directly in Excel or Google Sheets.</p></div>
+<div id="reportSummary" class="box"></div>
+</section>
+
+<section id="share" class="page">
+<div class="box"><h2>Share Data With Your Husband / Family</h2>
+<p class="small">Export your complete household data into one private file. Send it through WhatsApp, email or Drive. The receiver can import it into the same website and see the entries you made.</p>
+<div class="actions"><button class="primary" onclick="exportData()">Download Data File</button><button class="primary" onclick="shareData()">Share Data File</button><button class="secondary" onclick="document.getElementById('importFile').click()">Import Data File</button><input id="importFile" type="file" accept=".json" style="display:none" onchange="importData(event)"><button class="secondary" onclick="downloadCSV('all')">Download All Data CSV</button></div>
+<p class="small">Important: file sharing is not automatic live sync. If your husband changes the imported copy, you need to receive his updated data file to see his changes. Automatic two-way sync needs a secure cloud database and login.</p></div>
+<div class="box"><h2>Security</h2><p class="small">This app stores data in the browser for offline use. Exported files may contain sensitive financial information. Keep them private and never upload personal data files to a public GitHub repository.</p></div>
+</section>
+<div class="footer">Household Money Tracker • Offline-first household finance software</div>
+</main>
+
+<script>
+const KEY="householdMoneyTrackerV5";
+let db=JSON.parse(localStorage.getItem(KEY)||'null')||{settings:{budget:0},monthly:[],dailyIncome:[],expenses:[],loans:[],loanPayments:[],recharges:[]};
+// migrate old v3/v4 data where possible
+if(!db.monthly && db.monthlyIncome)db.monthly=db.monthlyIncome;
+if(!db.dailyIncome)db.dailyIncome=db.extraIncome||[];
+if(!db.loans)db.loans=[];if(!db.loanPayments)db.loanPayments=[];if(!db.recharges)db.recharges=[];if(!db.expenses)db.expenses=[];if(!db.monthly)db.monthly=[];
+const now=new Date(),today=now.toISOString().slice(0,10),ym=today.slice(0,7);
+function save(){localStorage.setItem(KEY,JSON.stringify(db));render()}
+function money(n){return "₹"+Number(n||0).toLocaleString("en-IN",{maximumFractionDigits:2})}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]))}
+function toggleMenu(){side.classList.toggle("show")}
+function show(id,btn){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));if(btn)btn.classList.add("active");render()}
+function addExpense(e){e.preventDefault();db.expenses.unshift({id:Date.now(),date:eDate.value,amount:+eAmount.value,cat:eCat.value,source:eSource.value,mode:eMode.value,person:ePerson.value,note:eNote.value});e.target.reset();eDate.value=today;save()}
+function addMonthlyIncome(e){e.preventDefault();db.monthly.unshift({id:Date.now(),month:miMonth.value,salary:+miAmount.value,used:+miUsed.value,budget:0,note:miNote.value});e.target.reset();miMonth.value=ym;save()}
+function addDailyIncome(e){e.preventDefault();db.dailyIncome.unshift({id:Date.now(),date:diDate.value,amount:+diAmount.value,cat:diSource.value,mode:diMode.value,note:diNote.value});e.target.reset();diDate.value=today;save()}
+function addMonthly(e){e.preventDefault();db.monthly.unshift({id:Date.now(),month:mMonth.value,salary:+mSalary.value,used:+mUsed.value,budget:+mBudget.value,note:mNote.value});e.target.reset();mMonth.value=ym;save()}
+function addLoan(e){e.preventDefault();db.loans.unshift({id:Date.now(),name:lName.value,total:+lTotal.value,monthlyInterest:+lMonthlyInterest.value,emi:+lEmi.value,start:lStart.value,principal:0,interest:0,next:lNext.value,note:lNote.value});e.target.reset();save()}
+function calcLoanPayment(){let l=db.loans.find(x=>x.id==pLoan.value);if(!l)return;let paid=+pAmount.value||0,interest=Math.min(+l.monthlyInterest||0,paid),principal=Math.max(0,paid-interest),remaining=Math.max(0,l.total-l.principal-principal);pInterest.value=interest.toFixed(2);pPrincipal.value=principal.toFixed(2);pRemaining.value=remaining.toFixed(2)}
+function nextEmiDate(v){let d=new Date(v+"T00:00:00");d.setMonth(d.getMonth()+1);return d.toISOString().slice(0,10)}
+function payLoan(e){e.preventDefault();let l=db.loans.find(x=>x.id==pLoan.value);if(!l)return;let paid=+pAmount.value||0,interest=Math.min(+l.monthlyInterest||0,paid),principal=Math.max(0,paid-interest),remaining=Math.max(0,l.total-l.principal-principal);l.principal+=principal;l.interest+=interest;if(l.next)l.next=nextEmiDate(l.next);db.loanPayments.unshift({id:Date.now(),loanId:l.id,date:pDate.value,amount:paid,interest,principal,balance:remaining,note:pNote.value});e.target.reset();pDate.value=today;save();alert("EMI payment saved. Interest, principal and remaining balance were calculated automatically.")}
+function addRecharge(e){e.preventDefault();let d=new Date(rDate.value+"T00:00:00");d.setDate(d.getDate()+Number(rDays.value));db.recharges.unshift({id:Date.now(),person:rPerson.value,mobile:rMobile.value,operator:rOperator.value,date:rDate.value,amount:+rAmount.value,days:+rDays.value,due:d.toISOString().slice(0,10),mode:rMode.value,note:rNote.value});e.target.reset();rDate.value=today;save()}
+function del(type,id){db[type]=db[type].filter(x=>x.id!==id);save()}
+function saveSettings(){db.settings.budget=+dashBudget.value||0;save();alert("Dashboard settings saved.")}
+function monthSalary(m){return db.monthly.filter(x=>x.month===m).reduce((a,x)=>a+(+x.salary||0),0)}
+function monthDaily(m){return db.dailyIncome.filter(x=>x.date.startsWith(m)).reduce((a,x)=>a+(+x.amount||0),0)}
+function spentFrom(m,s){return db.expenses.filter(x=>x.date.startsWith(m)&&x.source===s).reduce((a,x)=>a+(+x.amount||0),0)}
+function txRow(x,type){let src=x.source?" • From: "+x.source:"";let delType=type==="expense"?"expenses":(x.type==="monthly"?"monthly":"dailyIncome");return `<div class="row"><div><b>${esc(x.note||x.cat||"Transaction")}</b><div class="meta">${esc(x.date)} • ${esc(x.cat||"")} • ${esc(x.mode||"")}${esc(src)}${x.person?" • "+esc(x.person):""}</div></div><div class="right"><b class="${type==="expense"?"red":"green"}">${type==="expense"?"-":"+"}${money(x.amount)}</b><br><button class="danger" onclick="del('${delType}',${x.id})">Delete</button></div></div>`}
+function render(){
+let month=dashMonth.value||ym,salary=monthSalary(month),daily=monthDaily(month),mSpent=spentFrom(month,"Monthly Income"),dSpent=spentFrom(month,"Daily Income"),exp=mSpent+dSpent,loanBalance=db.loans.reduce((a,x)=>a+Math.max(0,(+x.total||0)-(+x.principal||0)),0),balance=salary+daily-exp;
+salaryTotal.textContent=money(salary);extraIncomeTotal.textContent=money(daily);expenseTotal.textContent=money(exp);balanceTotal.textContent=money(balance);if(typeof monthlySourceBalance!=='undefined')monthlySourceBalance.textContent=money(salary);if(typeof monthlySourceSpent!=='undefined')monthlySourceSpent.textContent=money(mSpent);if(typeof dailySourceBalance!=='undefined')dailySourceBalance.textContent=money(daily);if(typeof dailySourceSpent!=='undefined')dailySourceSpent.textContent=money(dSpent);
+if(typeof miReceived!=='undefined'){miReceived.textContent=money(salary);miUsedTotal.textContent=money(mSpent);miRemaining.textContent=money(salary-mSpent);diReceived.textContent=money(daily);diSpent.textContent=money(dSpent);diRemaining.textContent=money(daily-dSpent)}
+let budget=(db.monthly.find(x=>x.month===month&&x.budget>0)||{}).budget||db.settings.budget||0,pct=budget?Math.min(100,exp/budget*100):0;window.pct.textContent=pct.toFixed(0)+"%";bar.style.width=pct+"%";health.textContent=budget?`Budget ${money(budget)} • Spent ${money(exp)} • Remaining ${money(budget-exp)}`:`Monthly income ${money(salary)} + daily income ${money(daily)} • Expenses ${money(exp)}`;
+monthlyList.innerHTML=db.monthly.length?db.monthly.map(x=>`<div class="row"><div><b>${esc(x.month)}</b><div class="meta">Monthly income ${money(x.salary)} • Taken/Used ${money(x.used)} • Budget ${money(x.budget)}</div></div><button class="danger" onclick="del('monthly',${x.id})">Delete</button></div>`).join(""):"<div class='empty'>No monthly income entries.</div>";
+let all=[...db.expenses.map(x=>({...x,t:"expense"})),...db.dailyIncome.map(x=>({...x,t:"income",type:"daily"})),...db.monthly.filter(x=>x.month===month).map(x=>({...x,amount:x.salary,date:x.month+"-01",cat:"Monthly Income",mode:"",type:"monthly",t:"income"}))].sort((a,b)=>b.id-a.id);recent.innerHTML=all.slice(0,8).map(x=>txRow(x,x.t)).join("")||"<div class='empty'>No activity yet.</div>";dailyList.innerHTML=all.filter(x=>x.date.startsWith(month)).map(x=>txRow(x,x.t)).join("")||"<div class='empty'>No transactions for this month.</div>";incomeList.innerHTML=all.filter(x=>x.t==='income').map(x=>txRow(x,'income')).join("")||"<div class='empty'>No income records.</div>";
+loanList.innerHTML=db.loans.length?db.loans.map(x=>{let rem=Math.max(0,x.total-x.principal);let pays=db.loanPayments.filter(p=>p.loanId===x.id);return `<div class="row"><div><b>🏦 ${esc(x.name)}</b><div class="meta">Overall ${money(x.total)} • Monthly interest ${money(x.monthlyInterest)} • EMI ${money(x.emi)}</div><div class="meta">Principal paid ${money(x.principal)} • Interest paid ${money(x.interest)} • <b>Balance principal ${money(rem)}</b></div><div class="meta">Next EMI: ${esc(x.next||"Not set")} • Approx. payments left: ${x.emi?Math.ceil(rem/x.emi):"—"}</div>${pays.length?'<div class="meta" style="margin-top:8px"><b>Payments:</b> '+pays.map(p=>`${esc(p.date)} Paid ${money(p.amount)} | Interest ${money(p.interest)} | Principal ${money(p.principal)} | Balance ${money(p.balance)}`).join("<br>")+'</div>':""}</div><button class="danger" onclick="del('loans',${x.id})">Delete</button></div>`}).join(""):"<div class='empty'>No loans added.</div>";
+pLoan.innerHTML=db.loans.map(x=>`<option value="${x.id}">${esc(x.name)} — ${money(x.emi)} EMI</option>`).join("");if(db.loans.length){pLoan.value=db.loans[0].id;calcLoanPayment()}
+rechargeList.innerHTML=db.recharges.length?db.recharges.map(x=>`<div class="row"><div><b>📱 ${esc(x.person)} • ${esc(x.operator)}</b><div class="meta">${esc(x.mobile)} • ${esc(x.date)} • ${money(x.amount)} • ${x.days} days</div><span class="pill due">Due: ${esc(x.due)}</span></div><button class="danger" onclick="del('recharges',${x.id})">Delete</button></div>`).join(""):"<div class='empty'>No recharge records.</div>";
+let dues=[];db.loans.forEach(x=>{if(x.next)dues.push(`<div class="row"><div><b>🏦 ${esc(x.name)}</b><div class="meta">EMI ${money(x.emi)}</div></div><span class="pill due">${esc(x.next)}</span></div>`)});db.recharges.forEach(x=>dues.push(`<div class="row"><div><b>📱 ${esc(x.person)} recharge</b><div class="meta">${esc(x.operator)} • ${money(x.amount)}</div></div><span class="pill due">${esc(x.due)}</span></div>`));dueList.innerHTML=dues.join("")||"<div class='empty'>No upcoming due dates.</div>";
+reportSummary.innerHTML=`<h2>Report Summary</h2><p><b>${esc(reportMonth.value)}</b></p><p>Monthly income: <b>${money(salary)}</b> • Daily income: <b>${money(daily)}</b> • Expenses: <b>${money(exp)}</b> • Balance: <b>${money(balance)}</b></p><p>Spent from Monthly Income: <b>${money(mSpent)}</b> • Spent from Daily Income: <b>${money(dSpent)}</b></p>`;
+}
+function exportData(){let obj={app:"Household Money Tracker",version:5,exportedAt:new Date().toISOString(),data:db};let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)],{type:"application/json"}));a.download="household-money-tracker-data.json";a.click()}
+async function shareData(){let obj={app:"Household Money Tracker",version:5,exportedAt:new Date().toISOString(),data:db},file=new File([JSON.stringify(obj,null,2)],"household-money-tracker-data.json",{type:"application/json"});if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({title:"Household Money Tracker Data",text:"Household finance data",files:[file]})}catch(e){}}else{exportData();alert("The data file was downloaded. Share it through WhatsApp, email or Drive.")}}
+function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let o=JSON.parse(r.result),d=o.data||o;if(!d.expenses||!d.monthly||!d.dailyIncome||!d.loans)throw 0;if(confirm("Import this data and replace current data?")){db=d;save();alert("Data imported successfully.")}}catch(err){alert("Invalid Household Money Tracker file.")}e.target.value=""};r.readAsText(f)}
+function downloadCSV(type){let rows=[["Type","Date","Source","Category/Name","Amount","Payment Method","Person","Description"]],arr=[...db.expenses.map(x=>["Expense",x.date,x.source,x.cat,x.amount,x.mode,x.person,x.note]),...db.dailyIncome.map(x=>["Daily Income",x.date,"Daily Income",x.cat,x.amount,x.mode,"",x.note]),...db.monthly.map(x=>["Monthly Income",x.month+"-01","Monthly Income","",x.salary,"","",x.note])],year=String(reportYear.value),month=reportMonth.value;if(type==='monthly')arr=arr.filter(x=>x[1].startsWith(month));if(type==='yearly')arr=arr.filter(x=>x[1].startsWith(year));if(type==='weekly'){let end=new Date(),start=new Date();start.setDate(end.getDate()-6);arr=arr.filter(x=>{let d=new Date(x[1]);return d>=start&&d<=end})}rows.push(...arr);let csv=rows.map(r=>r.map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")).join("\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));a.download=`household-${type}-report.csv`;a.click()}
+dashMonth.value=ym;dashBudget.value=db.settings.budget||"";mMonth.value=ym;reportMonth.value=ym;reportYear.value=now.getFullYear();eDate.value=today;rDate.value=today;pDate.value=today;if(typeof miMonth!=='undefined')miMonth.value=ym;if(typeof diDate!=='undefined')diDate.value=today;dashMonth.addEventListener("change",render);pLoan.addEventListener("change",calcLoanPayment);pAmount.addEventListener("input",calcLoanPayment);render();
+</script>
+</body></html>
