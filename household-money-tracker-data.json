@@ -1,0 +1,92 @@
+{
+  "app": "Household Money Tracker",
+  "version": 5,
+  "exportedAt": "2026-08-22T11:15:05.705Z",
+  "data": {
+    "settings": {
+      "budget": 0
+    },
+    "monthly": [
+      {
+        "id": 1787396955393,
+        "month": "2026-08",
+        "salary": 15000,
+        "used": 0,
+        "budget": 0,
+        "note": ""
+      }
+    ],
+    "dailyIncome": [
+      {
+        "id": 1787396968562,
+        "date": "2026-08-22",
+        "amount": 500,
+        "cat": "Side Income",
+        "mode": "Cash",
+        "note": ""
+      }
+    ],
+    "expenses": [
+      {
+        "id": 1787396993387,
+        "date": "2026-08-22",
+        "amount": 100,
+        "cat": "Groceries",
+        "source": "Monthly Income",
+        "mode": "Cash",
+        "person": "",
+        "note": ""
+      }
+    ],
+    "loans": [
+      {
+        "id": 1787397199013,
+        "name": "Latha",
+        "total": 500000,
+        "monthlyInterest": 3073,
+        "emi": 15000,
+        "start": "2026-08-01",
+        "principal": 38854,
+        "interest": 6146,
+        "next": "",
+        "note": ""
+      }
+    ],
+    "loanPayments": [
+      {
+        "id": 1787397231387,
+        "loanId": 1787397199013,
+        "date": "2026-08-22",
+        "amount": 15000,
+        "interest": 3073,
+        "principal": 11927,
+        "balance": 461146,
+        "note": ""
+      },
+      {
+        "id": 1787397213479,
+        "loanId": 1787397199013,
+        "date": "2026-08-22",
+        "amount": 30000,
+        "interest": 3073,
+        "principal": 26927,
+        "balance": 473073,
+        "note": ""
+      }
+    ],
+    "recharges": [
+      {
+        "id": 1787397266590,
+        "person": "Latha",
+        "mobile": "7283939",
+        "operator": "Airtel",
+        "date": "2026-08-22",
+        "amount": 299,
+        "days": 28,
+        "due": "2026-09-18",
+        "mode": "GPay / UPI",
+        "note": ""
+      }
+    ]
+  }
+}
