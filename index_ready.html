@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#8b5e3c">
+<title>Home & Money Manager</title>
+<style>
+:root{--bg:#f5f7fb;--card:#ffffff;--text:#20263a;--muted:#70788a;--accent:#5b5bd6;--accent2:#263b80;--soft:#ececff;--good:#23845f;--bad:#c94f4f;--line:#dfe3ef}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:linear-gradient(135deg,#263b80,#5b5bd6,#8a6ee8);color:white;padding:26px 20px;position:sticky;top:0;z-index:5;box-shadow:0 10px 30px #263b8028}
+h1{margin:0 0 5px;font-size:25px}header p{margin:0;opacity:.9}
+nav{display:none}
+nav button{white-space:nowrap;border:0;border-radius:20px;padding:10px 14px;background:var(--soft);color:var(--text);font-weight:700}
+nav button.active{background:var(--accent);color:#fff}
+main{max-width:1100px;margin:auto;padding:16px}.page{display:none}.page.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 8px 24px #263b8012}
+.card h3{margin:0 0 8px}.amount{font-size:24px;font-weight:800}.muted{color:var(--muted);font-size:13px}
+form,.formgrid{display:grid;gap:10px}.formgrid{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+input,select,textarea{width:100%;padding:11px;border:1px solid #d9c5b3;border-radius:10px;background:#fff;font-size:15px}
+button.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:0;padding:11px 15px;border-radius:10px;font-weight:700;box-shadow:0 5px 14px #4f8cff25}
+button.danger{background:#fff0f0;color:var(--bad);border:1px solid #f0caca;padding:8px;border-radius:8px}
+table{width:100%;border-collapse:collapse;margin-top:12px}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
+.list{display:grid;gap:9px}.item{padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.item.done{text-decoration:line-through;opacity:.55}.row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.badge{display:inline-block;padding:4px 8px;border-radius:20px;background:var(--soft);font-size:12px}.good{color:var(--good)}.bad{color:var(--bad)}
+.progress{height:9px;background:#eee0d4;border-radius:20px;overflow:hidden}.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#8a6ee8)}
+.section-title{margin-top:24px}.hidden{display:none!important}
+@media(max-width:600px){main{padding:10px}h1{font-size:22px}nav{top:78px}th,td{font-size:12px;padding:7px}}
+.menuBtn{position:absolute;right:15px;top:18px;width:46px;height:46px;border:0;border-radius:14px;background:#ffffff25;color:#fff;font-size:28px;font-weight:900;cursor:pointer}
+.menuPanel{position:fixed;right:12px;top:74px;width:min(300px,calc(100vw - 24px));background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px;box-shadow:0 15px 40px #20304730;z-index:20;display:none}
+.menuPanel.show{display:block}
+.menuPanel button{width:100%;text-align:left;border:0;background:#fff;padding:12px;border-radius:10px;font-weight:700;color:var(--text)}
+.menuPanel button:hover{background:var(--soft)}
+.actions{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+button.small{padding:7px 10px;border:0;border-radius:8px;background:var(--soft);color:var(--text);font-weight:700}
+button.savebtn{background:#e9fff4;color:var(--good)}
+button.editbtn{background:#eef4ff;color:#3976df}
+ .dashboard-hero{background:linear-gradient(135deg,#fffaf3,#f3e6da);border:1px solid var(--line);border-radius:24px;padding:22px;margin-bottom:14px}.dashboard-hero h2{margin:0 0 6px;font-size:27px}.stat-card{position:relative;overflow:hidden}.stat-card .icon{font-size:26px}.stat-card .sub{font-size:12px;color:var(--muted);margin-top:8px}.account-picker{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.account-picker select{max-width:320px}.account-hidden{display:none!important}.ledger-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.ledger-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px}.ledger-wrap table{min-width:780px;margin:0}.dropzone{border:2px dashed #d7bda8;border-radius:16px;padding:18px;text-align:center;background:#fffaf5}.small-note{font-size:12px;color:var(--muted)}
+.dashboard-hero{background:linear-gradient(135deg,#fffaf3,#f0e0d2);border:1px solid var(--line);border-radius:24px;padding:22px;margin-bottom:14px}.dashboard-hero h2{margin:0 0 6px;font-size:27px}.home-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}@media(min-width:760px){.home-stats{grid-template-columns:repeat(4,minmax(0,1fr))}}.home-stat{cursor:pointer;transition:.18s}.home-stat:hover{transform:translateY(-3px)}.home-stat .big{font-size:22px;font-weight:900;margin-top:6px}.home-stat .sub{font-size:12px;color:var(--muted);margin-top:6px}.detail-panel{margin-top:12px;border-left:4px solid var(--accent)}.hidden-detail{display:none!important}.smart-upload{border:2px dashed #d2b49d;border-radius:18px;padding:18px;text-align:center;background:#fffaf6}.smart-preview{max-height:160px;max-width:100%;border-radius:12px;margin:10px auto;display:block}.clickable-item{cursor:pointer}
+
+.smart-import{margin-top:14px;padding:18px;border:2px dashed #b9bced;border-radius:20px;background:linear-gradient(135deg,#fafaff,#f3f4ff)}
+.smart-import input[type=file]{margin-top:10px;background:#fff}
+.smart-result{margin-top:12px}.smart-preview{max-width:100%;max-height:180px;border-radius:14px;display:block;margin:10px auto}.smart-row{display:grid;grid-template-columns:1fr 130px;gap:8px;margin:7px 0}.smart-help{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header><button class="menuBtn" onclick="toggleMenu()" aria-label="Menu">⋮</button><h1>🏠 Home & Money Manager</h1><p>Income • Expenses • Savings • Plans • Household</p></header>
+<nav id="nav"></nav><div id="menuPanel" class="menuPanel"></div>
+<main id="app"></main>
+
+<script>
+const KEY="homeMoneyManager_v1";
+let data=JSON.parse(localStorage.getItem(KEY)||'null')||{
+ income:[], expenses:[], savings:[], payments:[], tasks:[], recharges:[], groceries:[], plans:[]
+};
+const money=n=>'₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2});
+const today=()=>new Date().toISOString().slice(0,10);
+data.accounts=data.accounts||[];data.accounts.forEach(a=>{a.owner=a.owner||'';a.accountNumber=a.accountNumber||'';a.openingBalance=(a.openingBalance??a.balance??0)});data.accountTx=data.accountTx||[];
+const save=()=>localStorage.setItem(KEY,JSON.stringify(data));
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const navItems=[
+['dashboard','🏠 Dashboard'],['accounts','💳 Accounts'],['income','💰 Income'],['expenses','🧾 Expenses'],
+['savings','🏦 Savings'],['savingplan','📊 Save Plan'],['tasks','🧹 Home Tasks'],
+['recharge','📱 Recharge'],['grocery','🛒 Grocery'],['reports','📈 Reports']
+];
+let current='dashboard';
+function renderNav(){
+document.getElementById('nav').innerHTML='';
+document.getElementById('menuPanel').innerHTML=navItems.map(x=>`<button onclick="go('${x[0]}')">${x[1]}</button>`).join('');
+}
+function toggleMenu(){document.getElementById('menuPanel').classList.toggle('show')}
+function go(p){current=p;renderNav();document.getElementById('menuPanel').classList.remove('show');render()}
+function totalIncome(type){return data.income.filter(x=>x.type==type).reduce((a,x)=>a+ +x.amount,0)}
+function totalExpense(source){return data.expenses.filter(x=>x.source==source).reduce((a,x)=>a+ +x.amount,0)}
+function render(){let a=document.getElementById('app');renderNav();
+if(current==='dashboard')a.innerHTML=dashboard();
+if(current==='accounts')a.innerHTML=accountsPage();
+if(current==='income')a.innerHTML=incomePage();
+if(current==='expenses')a.innerHTML=expensePage();
+if(current==='savings')a.innerHTML=savingsPage();
+if(current==='savingplan')a.innerHTML=planPage();
+if(current==='tasks')a.innerHTML=tasksPage();
+if(current==='recharge')a.innerHTML=rechargePage();
+if(current==='grocery')a.innerHTML=groceryPage();
+if(current==='reports')a.innerHTML=reportsPage();
+}
+
+function saveEdit(collection,index,obj){data[collection][index]=obj;save();render()}
+function removeItem(collection,index){if(confirm('Delete this item?')){data[collection].splice(index,1);save();render()}}
+function editIncome(i){let x=data.income[i],amount=prompt('Amount',x.amount),note=prompt('Source / note',x.note||'');if(amount===null)return;x.amount=+amount;x.note=note||'';save();render()}
+function editExpense(i){let x=data.expenses[i],amount=prompt('Amount',x.amount),cat=prompt('Category',x.category),note=prompt('Note',x.note||'');if(amount===null)return;x.amount=+amount;x.category=cat||x.category;x.note=note||'';save();render()}
+function editSaving(i){let x=data.savings[i],amount=prompt('Installment / amount',x.amount),goal=prompt('Total target',x.total||0);if(amount===null)return;x.amount=+amount;x.total=+goal||0;save();render()}
+function editPlan(i){let x=data.plans[i],name=prompt('Goal name',x.name),target=prompt('Target amount',x.target),monthly=prompt('Monthly saving',x.monthly);if(name===null)return;x.name=name;x.target=+target||0;x.monthly=+monthly||0;save();render()}
+function editTask(i){let x=data.tasks[i],name=prompt('Task',x.name),date=prompt('Due date YYYY-MM-DD',x.date);if(name===null)return;x.name=name;x.date=date||x.date;save();render()}
+function editRecharge(i){let x=data.recharges[i],name=prompt('Person / label',x.name),amount=prompt('Amount',x.amount),date=prompt('Next recharge date YYYY-MM-DD',x.date);if(name===null)return;x.name=name;x.amount=+amount||0;x.date=date||x.date;save();render()}
+function editGrocery(i){let x=data.groceries[i],name=prompt('Item',x.name),qty=prompt('Qty / notes',x.qty||'');if(name===null)return;x.name=name;x.qty=qty||'';save();render()}
+function editAccount(i){
+ ensureAccounts();let x=data.accounts[i];
+ let owner=prompt('Person name',x.owner||''),name=prompt('Account / Bank name',x.name),bal=prompt('Current balance',x.balance);
+ if(name===null)return;
+ x.owner=owner||x.owner||'';x.name=name;x.balance=+bal||0;save();render()
+}
+function editAccountTx(i){ensureAccounts();let x=data.accountTx[i],d=prompt('What happened?',x.description),amt=prompt('Money amount',x.debit||x.credit);if(d===null)return;x.description=d;x.debit=x.debit?+amt:0;x.credit=x.credit?+amt:0;save();render()}
+function dashboard(){
+ const mi=totalIncome('Monthly'),di=totalIncome('Daily'),me=totalExpense('Monthly Income'),de=totalExpense('Daily Income');
+ const cash=data.accounts.filter(a=>(a.type||'')==='Cash').reduce((s,a)=>s+(+a.balance||0),0);
+ const bank=data.accounts.filter(a=>(a.type||'')==='Bank Account').reduce((s,a)=>s+(+a.balance||0),0);
+ const sav=data.savings.reduce((s,a)=>s+(+a.paid||0),0);
+ return `<div class="dashboard-hero"><h2>🏡 Home & Money</h2><div class="muted">Tap a box to see its details. Important information stays inside the section you choose.</div></div><div class="home-stats">
+ <div class="card home-stat" onclick="dashboardDetail('monthly')">💰 Monthly Income<div class="big">${money(mi)}</div><div class="sub">Spent: ${money(me)}</div></div>
+ <div class="card home-stat" onclick="dashboardDetail('daily')">☀️ Daily Income<div class="big">${money(di)}</div><div class="sub">Spent: ${money(de)}</div></div>
+ <div class="card home-stat" onclick="dashboardDetail('cash')">💵 Cash<div class="big">${money(cash)}</div><div class="sub">Tap for details</div></div>
+ <div class="card home-stat" onclick="dashboardDetail('bank')">🏦 Bank<div class="big">${money(bank)}</div><div class="sub">Tap for accounts</div></div>
+ <div class="card home-stat" onclick="dashboardDetail('savings')">💚 Savings<div class="big">${money(sav)}</div><div class="sub">Tap for details</div></div>
+ <div class="card home-stat" onclick="go('expenses')">🧾 Expenses<div class="big">${money(me+de)}</div><div class="sub">Tap to open</div></div>
+ <div class="card home-stat" onclick="go('grocery')">🛒 Grocery<div class="big">${data.groceries.length}</div><div class="sub">Tap to open</div></div>
+ <div class="card home-stat" onclick="go('reports')">📈 Reports<div class="big">View</div><div class="sub">Tap to open</div></div></div><div id="dashboardDetailBox" class="card detail-panel hidden-detail"></div><h3 class="section-title">⚡ Quick Add</h3><div class="grid"><button class="primary" onclick="go('income')">＋ Income</button><button class="primary" onclick="go('expenses')">＋ Expense</button><button class="primary" onclick="go('accounts')">＋ Bank</button><button class="primary" onclick="go('grocery')">＋ Grocery</button></div>`;
+}
+function dashboardDetail(type){const b=document.getElementById('dashboardDetailBox');if(!b)return;let title='',body='';if(type==='monthly'){title='💰 Monthly Income';body=data.income.filter(x=>x.type==='Monthly').map(x=>`${x.date||''} — ${money(x.amount)} — ${esc(x.note||'')}`).join('<br>')||'No monthly income.'}if(type==='daily'){title='☀️ Daily Income';body=data.income.filter(x=>x.type==='Daily').map(x=>`${x.date||''} — ${money(x.amount)} — ${esc(x.note||'')}`).join('<br>')||'No daily income.'}if(type==='cash'){title='💵 Cash Accounts';body=data.accounts.filter(x=>x.type==='Cash').map(x=>`${esc(x.owner||'')} — ${esc(x.name)} — ${money(x.balance)}`).join('<br>')||'No cash account.'}if(type==='bank'){title='🏦 Bank Accounts';body=data.accounts.filter(x=>x.type==='Bank Account').map(x=>`${esc(x.owner||'')} — ${esc(x.name)} — ${money(x.balance)}`).join('<br>')||'No bank account.'}if(type==='savings'){title='💚 Savings';body=data.savings.map(x=>`${esc(x.name)} — Paid ${money(x.paid||0)} / ${money(x.total||0)}`).join('<br>')||'No savings.'}b.innerHTML=`<h3>${title}</h3><div class="small-note">${body}</div><button class="small" onclick="this.parentElement.classList.add('hidden-detail')">Close</button>`;b.classList.remove('hidden-detail')}
+
+function accountsPage(){
+ ensureAccounts();let people=[...new Set(data.accounts.map(a=>a.owner).filter(Boolean))];
+ return `<h2>🏦 Accounts</h2><div class="card"><div class="account-picker"><b>👤 Choose Name</b><select id="accountOwnerSelect" onchange="showOwnerAccounts(this.value)"><option value="">Select a person...</option>${people.map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('')}</select><button class="small" onclick="showAllAccounts()">Show All</button></div><div id="ownerAccountSummary" class="small-note" style="margin-top:10px">Choose a name to view that person's accounts.</div></div>
+ <div class="card"><h3>＋ Add Account</h3><form onsubmit="addAccount(event)"><div class="formgrid"><input id="aowner" placeholder="Person name" required><input id="acn" placeholder="Bank / Account name" required><input id="acnum" placeholder="Account number (optional)"><select id="act"><option>Bank Account</option><option>GPay / UPI</option><option>Cash</option><option>Family Account</option><option>Other</option></select><input id="acb" type="number" step="0.01" min="0" placeholder="Opening / Current Balance" required><input id="aco" placeholder="Bank note / branch (optional)"></div><button class="primary">💾 Save Account</button></form></div>
+ <div id="accountCards">${data.accounts.map((a,i)=>accountCard(a,i)).join('')}</div><div id="selectedLedger" class="card hidden"></div>
+ <div class="card"><div class="ledger-head"><h3>📥 Bank Statement Import</h3><span class="small-note">Image / Screenshot / PDF</span></div><div class="dropzone"><p><b>Select the bank, then upload its statement.</b></p><select id="importAccount"><option value="">Choose bank account...</option>${data.accounts.map((a,i)=>`<option value="${i}">${esc(a.owner||'')} — ${esc(a.name)}</option>`).join('')}</select><input id="statementFile" type="file" accept="image/*,.pdf,application/pdf" onchange="readStatementImage(event)"><div id="ocrStatus" class="small-note" style="margin-top:10px"></div><div id="ocrResult"></div></div></div>`;
+}
+function accountCard(a,i){return `<div class="card account-card account-hidden" data-owner="${esc(a.owner||'')}"><div class="row"><div><h3 style="margin-bottom:4px">${esc(a.name)}</h3><div class="small-note">👤 ${esc(a.owner||'')}</div></div><span class="badge">${esc(a.type)}</span></div><div class="amount">${money(a.balance)}</div>${a.accountNumber?`<div class="small-note">Account: ••••${esc(String(a.accountNumber).slice(-4))}</div>`:''}<div class="small-note">${esc(a.note||'')}</div><div class="actions"><button class="primary" onclick="openAccountLedger(${i})">📒 Open Ledger</button><button class="small" onclick="accountIncome(${i})">＋ Money In</button><button class="small" onclick="accountExpense(${i})">− Money Out</button><button class="small editbtn" onclick="editAccount(${i})">✏️ Edit</button><button class="small" onclick="deleteAccount(${i})">🗑️ Delete</button></div></div>`}
+function ensureAccounts(){data.accounts=data.accounts||[];data.accountTx=data.accountTx||[]}
+function addAccount(e){
+ e.preventDefault();ensureAccounts();
+ data.accounts.push({owner:aowner.value.trim(),name:acn.value.trim(),accountNumber:acnum.value.trim(),type:act.value,balance:+acb.value,openingBalance:+acb.value,note:aco.value});
+ save();go('accounts')
+}
+function showOwnerAccounts(owner){
+ const cards=[...document.querySelectorAll('.account-card')];
+ cards.forEach(c=>c.style.display=(!owner||c.dataset.owner===owner)?'block':'none');
+ const list=data.accounts.filter(a=>!owner||a.owner===owner);
+ const total=list.reduce((s,a)=>s+(+a.balance||0),0);
+ const el=document.getElementById('ownerAccountSummary');
+ if(el) el.innerHTML=owner
+   ? `<b>${esc(owner)}</b> — ${list.length} account(s) — Total balance: <span class="good"><b>${money(total)}</b></span><br><span class="muted">${list.map(a=>esc(a.name)+': '+money(a.balance)).join(' • ')}</span>`
+   : 'Choose a person to see their bank accounts and balances.';
+}
+function accountExpense(i){
+ensureAccounts();let a=data.accounts[i],v=prompt('எவ்வளவு பணம் போனது?');if(v===null)return;v=+v;if(!v||v<0)return;
+let d=prompt('எதற்காக? (Grocery / Recharge / Transfer...)','Expense');a.balance-=v;
+data.accountTx.push({date:today(),account:a.name,description:d||'Expense',debit:v,credit:0,balance:a.balance});save();render()
+}
+function accountIncome(i){
+ensureAccounts();let a=data.accounts[i],v=prompt('எவ்வளவு பணம் வந்தது?');if(v===null)return;v=+v;if(!v||v<0)return;
+let d=prompt('எங்கிருந்து வந்தது?','Income');a.balance+=v;
+data.accountTx.push({date:today(),account:a.name,description:d||'Income',debit:0,credit:v,balance:a.balance});save();render()
+}function showAllAccounts(){document.querySelectorAll('.account-card').forEach(c=>c.classList.remove('account-hidden'));let s=document.getElementById('ownerAccountSummary');if(s)s.textContent='Showing all saved accounts.'}
+function showOwnerAccounts(owner){document.querySelectorAll('.account-card').forEach(c=>c.classList.toggle('account-hidden',!owner||c.dataset.owner!==owner));let list=data.accounts.filter(a=>a.owner===owner),total=list.reduce((s,a)=>s+(+a.balance||0),0),el=document.getElementById('ownerAccountSummary');if(el)el.innerHTML=owner?`<b>${esc(owner)}</b> • ${list.length} account(s) • Total: <b>${money(total)}</b>`:'Choose a name to view that person\'s accounts.'}
+function openAccountLedger(i){let a=data.accounts[i],tx=data.accountTx.filter(t=>t.account===a.name),el=document.getElementById('selectedLedger');let rows=tx.map(t=>`<tr><td>${esc(t.date||'')}</td><td>${esc(t.description||'')}</td><td>${t.debit?money(t.debit):'-'}</td><td>${t.credit?money(t.credit):'-'}</td><td>${money(t.balance)}</td></tr>`).join('');el.classList.remove('hidden');el.innerHTML=`<div class="ledger-head"><h3>📒 ${esc(a.name)} — Ledger</h3><button class="small" onclick="this.closest('#selectedLedger').classList.add('hidden')">Close</button></div><div class="small-note">Owner: ${esc(a.owner||'')} • Current balance: <b>${money(a.balance)}</b></div><div class="actions"><button class="primary" onclick="manualLedgerEntry(${i})">＋ Manual Entry</button><button class="small" onclick="downloadAccountExcel(${i})">📊 Download Excel</button></div><div class="ledger-wrap"><table><tr><th>Date</th><th>Description</th><th>Money Out</th><th>Money In</th><th>Balance</th></tr>${rows||'<tr><td colspan="5">No entries yet.</td></tr>'}</table></div>`;el.scrollIntoView({behavior:'smooth'})}
+function manualLedgerEntry(i){let a=data.accounts[i],date=prompt('Date YYYY-MM-DD',today());if(!date)return;let desc=prompt('Description','Manual entry');if(desc===null)return;let type=prompt('IN = Money In, OUT = Money Out','OUT');if(type===null)return;let amount=+prompt('Amount','0');if(!amount)return;if(String(type).toUpperCase()==='IN')a.balance+=amount;else a.balance-=amount;data.accountTx.push({date,account:a.name,description:desc,debit:String(type).toUpperCase()==='IN'?0:amount,credit:String(type).toUpperCase()==='IN'?amount:0,balance:a.balance});save();openAccountLedger(i)}
+function downloadAccountExcel(i){let a=data.accounts[i],rows=data.accountTx.filter(t=>t.account===a.name),csv='Date,Account,Description,Money Out,Money In,Balance\n'+rows.map(t=>[t.date,a.name,t.description||'',t.debit||0,t.credit||0,t.balance||0].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n'),b=new Blob([csv],{type:'text/csv;charset=utf-8'}),x=document.createElement('a');x.href=URL.createObjectURL(b);x.download=(a.name||'bank')+'_ledger.csv';x.click()}
+
+function deleteAccount(i){if(confirm('Delete this account?')){ensureAccounts();data.accounts.splice(i,1);save();render()}}
+
+async function readStatementImage(e){
+const file=e.target.files[0]; if(!file)return;
+const status=document.getElementById('ocrStatus'),out=document.getElementById('ocrResult');
+status.textContent='Reading image… OCR library loading.';
+out.innerHTML='';
+try{
+ if(!window.Tesseract){
+  await new Promise((resolve,reject)=>{
+   const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+   s.onload=resolve;s.onerror=reject;document.head.appendChild(s);
+  });
+ }
+ status.textContent='OCR running… This can take a little time.';
+ const result=await Tesseract.recognize(file,'eng');
+ const text=result.data.text||'';
+ status.textContent='Text read. Please review the suggested ledger rows below.';
+ const lines=text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+ const rows=[];
+ for(const line of lines){
+   const nums=line.match(/(?:₹|Rs\.?|INR)?\s*[\d,]+(?:\.\d{1,2})?/g);
+   if(nums && nums.length){
+     const amounts=nums.map(n=>parseFloat(n.replace(/[^\d.]/g,''))).filter(n=>!isNaN(n));
+     if(amounts.length) rows.push({raw:line,amount:amounts[amounts.length-1]});
+   }
+ }
+ window._ocrRows=rows;
+ out.innerHTML=`<div class="card"><b>Extracted text:</b><pre style="white-space:pre-wrap;font-size:12px">${esc(text.slice(0,12000))}</pre>
+ <p class="muted">OCR cannot reliably understand every bank/passbook layout. Use the review fields below and correct anything wrong before saving.</p>
+ <button class="primary" onclick="saveOCRRows()">Add reviewed rows to Ledger</button></div>`;
+}catch(err){
+ status.textContent='OCR could not run. You can still add transactions manually.';
+ out.innerHTML='<div class="card">Try a clearer screenshot, or use Money Out / Money In on the account card.</div>';
+}}
+function saveOCRRows(){
+ensureAccounts();const rows=window._ocrRows||[];
+if(!rows.length){alert('No amount-like entries were detected.');return}
+const selected=document.getElementById('importAccount');const account=selected&&selected.value!==''?data.accounts[+selected.value].name:prompt('Which account does this statement belong to?');
+if(!account)return;
+let a=data.accounts.find(x=>x.name.toLowerCase()===account.toLowerCase());
+if(!a){alert('Account not found. Add the account first.');return}
+rows.forEach(r=>{data.accountTx.push({date:r.date||today(),account:a.name,description:r.description||'Statement entry',debit:+r.debit||0,credit:+r.credit||0,balance:+r.balance||a.balance,raw:r.raw})});
+save();render();alert(rows.length+' statement rows added. Please review the ledger.');
+}
+
+function incomePage(){return `<h2>Income</h2><div class="card"><form onsubmit="addIncome(event)"><div class="formgrid">
+<select id="it"><option>Daily</option><option>Monthly</option></select><input id="ia" type="number" min="0" step="0.01" placeholder="Amount" required>
+<select id="im"><option>Cash</option><option>GPay</option><option>Net Banking</option></select><input id="idate" type="date" value="${today()}" required><input id="inote" placeholder="Source / note"></div><button class="primary">Add Income</button></form></div>
+<h3>Income Entries</h3><div class="list">${data.income.slice().reverse().map((x,i)=>`<div class="item"><div class="row"><b>${money(x.amount)}</b><span class="badge">${x.type} • ${x.method}</span></div><div class="muted">${x.date} • ${esc(x.note||'')}</div><div class="actions"><button class="small editbtn" onclick="editIncome(${data.income.indexOf(x)})">✏️ Edit</button><button class="small" onclick="removeItem('income',${data.income.indexOf(x)})">🗑️ Delete</button><button class="small savebtn" onclick="save()">💾 Save</button></div></div>`).join('')||'<div class="card">No income entries.</div>'}</div>`}
+function addIncome(e){e.preventDefault();data.income.push({type:it.value,amount:ia.value,method:im.value,date:idate.value,note:inote.value});save();go('income')}
+function expensePage(){return `<h2>Expenses</h2><div class="card"><form onsubmit="addExpense(event)"><div class="formgrid">
+<select id="es"><option>Monthly Income</option><option>Daily Income</option><option>Other Savings</option></select><input id="ea" type="number" min="0" step="0.01" placeholder="Amount" required><input id="ec" placeholder="Category (Dress, Grocery, House...) " required><select id="em"><option>Cash</option><option>GPay</option><option>Net Banking</option></select><input id="ed" type="date" value="${today()}"><input id="en" placeholder="Note"></div><button class="primary">Add Expense</button></form></div><div class="card smart-import"><h3>📷 Upload Expense Bill / Screenshot</h3><div class="smart-help">Upload any household bill. Detected description and amount will appear in an editable list before saving.</div><input type="file" accept="image/*,.pdf" onchange="smartAnalyze(this,'expense')"><div id="smart-expense-result" class="smart-result"></div></div>
+<h3>Monthly Income Expenses: ${money(totalExpense('Monthly Income'))}</h3><h3>Daily Income Expenses: ${money(totalExpense('Daily Income'))}</h3><div class="list">${data.expenses.slice().reverse().map(x=>`<div class="item"><div class="row"><b>${money(x.amount)} — ${esc(x.category)}</b><span class="badge">${x.source}</span></div><div class="muted">${x.date} • ${x.method} • ${esc(x.note||'')}</div><div class="actions"><button class="small editbtn" onclick="editExpense(${data.expenses.indexOf(x)})">✏️ Edit</button><button class="small" onclick="removeItem('expenses',${data.expenses.indexOf(x)})">🗑️ Delete</button><button class="small savebtn" onclick="save()">💾 Save</button></div></div>`).join('')||'<div class="card">No expenses.</div>'}</div>`}
+function addExpense(e){e.preventDefault();data.expenses.push({source:es.value,amount:ea.value,category:ec.value,method:em.value,date:ed.value,note:en.value});save();go('expenses')}
+function savingsPage(){return `<h2>Savings</h2><div class="card"><form onsubmit="addSaving(event)"><div class="formgrid">
+<input id="sn" placeholder="Saving name (e.g. RD)" required><select id="st"><option>RD</option><option>PPF</option><option>CDA</option><option>DigiGold</option><option>Gold Chit</option><option>Post Office</option><option>Other</option></select><input id="sa" type="number" min="0" placeholder="Installment / amount" required><input id="sgoal" type="number" min="0" placeholder="Total target / maturity amount"><input id="ss" type="date" value="${today()}"><input id="se" type="date"><input id="sd" type="date" value="${today()}"><input id="snext" type="date" value="${today()}"><select id="spay"><option>Cash</option><option>GPay</option><option>Net Banking</option></select></div><button class="primary">Add Saving Plan</button></form></div><div class="card smart-import"><h3>📷 Upload Saving Receipt / Screenshot</h3><div class="smart-help">Upload a saving/RD/PPF receipt. Review detected name and amount before saving.</div><input type="file" accept="image/*,.pdf" onchange="smartAnalyze(this,'saving')"><div id="smart-saving-result" class="smart-result"></div></div>
+<div class="grid">${data.savings.map((s,i)=>`<div class="card"><div class="row"><h3>${esc(s.name)}</h3><span class="badge">${s.type}</span></div><p>Installment: <b>${money(s.amount)}</b></p><p>Paid: <b>${money(s.paid||0)}</b> / ${money(s.total||0)}</p><p>Start: ${s.start||'-'} • End: ${s.end||'-'}</p><p>Next due: <b class="${s.nextDue<=today()?'bad':''}">${s.nextDue||'-'}</b></p><div class="progress"><i style="width:${Math.min(100,(s.paid||0)/(s.total||1)*100)}%"></i></div><br><button class="primary" onclick="paySaving(${i})">✓ Pay & Set Next Due</button><div class="actions"><button class="small editbtn" onclick="editSaving(${i})">✏️ Edit</button><button class="small" onclick="delSaving(${i})">🗑️ Delete</button><button class="small savebtn" onclick="save()">💾 Save</button></div></div>`).join('')||'<div class="card">Add your RD, PPF, CDA, DigiGold or other savings here.</div>'}</div>`}
+function addSaving(e){e.preventDefault();data.savings.push({name:sn.value,type:st.value,amount:+sa.value,total:+sgoal.value,start:ss.value,end:se.value,lastPaid:null,nextDue:snext.value,method:spay.value,paid:0});save();go('savings')}
+function paySaving(i){let s=data.savings[i];s.paid=(s.paid||0)+ +s.amount;s.lastPaid=today();let d=new Date(s.nextDue||today());d.setMonth(d.getMonth()+1);s.nextDue=d.toISOString().slice(0,10);s.paidToday=true;save();render()}
+function delSaving(i){if(confirm('Delete this saving?')){data.savings.splice(i,1);save();render()}}
+function planPage(){return `<h2>Save Plan & Budget Planner</h2><div class="card"><form onsubmit="addPlan(event)"><div class="formgrid"><input id="pn" placeholder="Goal (Trip / Outing / Movie / Dress)" required><select id="pc"><option>Trip</option><option>Monthly Outing</option><option>Movie</option><option>Beach</option><option>Engagement / Function</option><option>Dress</option><option>Household Purchase</option><option>Other</option></select><input id="pt" type="number" min="0" placeholder="Target amount" required><input id="pmo" type="number" min="0" placeholder="Monthly amount you can save" required><input id="pdate" type="date"><textarea id="pnote" placeholder="Plan / details"></textarea></div><button class="primary">Add Plan</button></form></div>
+<div class="grid">${data.plans.map((p,i)=>`<div class="card"><h3>${esc(p.name)}</h3><span class="badge">${p.category}</span><p>Target: ${money(p.target)}</p><p>Monthly save: ${money(p.monthly)}</p><p class="muted">Suggested: ${p.target&&p.monthly?Math.ceil(p.target/p.monthly)+' months':''}</p><div class="actions"><button class="small editbtn" onclick="editPlan(${i})">✏️ Edit</button><button class="small" onclick="removeItem('plans',${i})">🗑️ Delete</button><button class="small savebtn" onclick="save()">💾 Save</button></div></div>`).join('')||'<div class="card">Example planning: add a Trip, monthly outing, movie, beach, dress or household goal with the amount you can realistically save.</div>'}</div>`}
+function addPlan(e){e.preventDefault();data.plans.push({name:pn.value,category:pc.value,target:+pt.value,monthly:+pmo.value,date:pdate.value,note:pnote.value});save();go('savingplan')}
+function tasksPage(){return `<h2>Home Tasks & Reminders</h2><div class="card"><form onsubmit="addTask(event)"><div class="formgrid"><input id="tn" placeholder="Task (Clean house, Pooja, Garden...)" required><select id="tf"><option>Monthly</option><option>Weekly</option><option>Daily</option><option>One Time</option></select><input id="td" type="date" value="${today()}"><input id="trem" type="number" min="0" value="1" placeholder="Remind days before"><input id="tnote" placeholder="Note"></div><button class="primary">Add Task</button></form></div><div class="list">${data.tasks.map((t,i)=>`<div class="item ${t.done?'done':''}"><div class="row"><label><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask(${i})"> <b>${esc(t.name)}</b></label><span class="badge">${t.freq}</span></div><div class="muted">Due: ${t.date} • Reminder: ${t.remind} day(s) before • ${esc(t.note||'')}</div><div class="actions"><button class="small editbtn" onclick="editTask(${i})">✏️ Edit</button><button class="small" onclick="removeItem('tasks',${i})">🗑️ Delete</button><button class="small savebtn" onclick="save()">💾 Save</button></div></div>`).join('')||'<div class="card">Add cleaning, pooja, garden and other household tasks.</div>'}</div>`}
+function addTask(e){e.preventDefault();data.tasks.push({name:tn.value,freq:tf.value,date:td.value,remind:+trem.value,note:tnote.value,done:false});save();go('tasks')}
+function toggleTask(i){data.tasks[i].done=!data.tasks[i].done;save();render()}
+function rechargePage(){return `<h2>Recharge Manager</h2><div class="card"><form onsubmit="addRecharge(event)"><div class="formgrid"><input id="rn" placeholder="Person / Number label" required><select id="rt"><option>Mobile</option><option>DTH</option><option>Internet</option><option>Other</option></select><input id="ram" type="number" placeholder="Amount" required><input id="rd" type="date" value="${today()}"><select id="rm"><option>GPay</option><option>Cash</option><option>Net Banking</option></select></div><button class="primary">Add Recharge</button></form></div><div class="card smart-import"><h3>📷 Upload Recharge Bill / Screenshot</h3><div class="smart-help">Upload a mobile, DTH, internet or other recharge bill. The app will read the text and amounts, show a list for you to edit, then save only after your confirmation.</div><input type="file" accept="image/*,.pdf" onchange="smartAnalyze(this,'recharge')"><div id="smart-recharge-result" class="smart-result"></div></div><div class="list">${data.recharges.map((r,i)=>`<div class="item"><div class="row"><b>${esc(r.name)} — ${money(r.amount)}</b><span class="badge">${r.type}</span></div><div class="muted">Next recharge: ${r.date} • ${r.method}</div><button class="primary" onclick="doneRecharge(${i})">Recharge Done → Next Month</button><div class="actions"><button class="small editbtn" onclick="editRecharge(${i})">✏️ Edit</button><button class="small" onclick="removeItem('recharges',${i})">🗑️ Delete</button><button class="small savebtn" onclick="save()">💾 Save</button></div></div>`).join('')||'<div class="card">Add family members / services that need monthly recharge.</div>'}</div>`}
+function addRecharge(e){e.preventDefault();data.recharges.push({name:rn.value,type:rt.value,amount:+ram.value,date:rd.value,method:rm.value});save();go('recharge')}
+function doneRecharge(i){let r=data.recharges[i],d=new Date(r.date);d.setMonth(d.getMonth()+1);r.date=d.toISOString().slice(0,10);save();render()}
+function groceryPage(){return `<h2>Grocery & Shopping Checklists</h2><div class="card"><form onsubmit="addGrocery(event)"><div class="formgrid"><input id="gn" placeholder="Item name" required><select id="gc"><option>Kitchen / Cooking</option><option>Cleaning</option><option>Personal Care</option><option>Pooja Items</option><option>Other</option></select><input id="gqty" placeholder="Qty / notes"><select id="gf"><option>Monthly</option><option>As Needed</option></select></div><button class="primary">Add Grocery Item</button></form></div><div class="card smart-import"><h3>📷 Upload Grocery Bill / Shopping List</h3><div class="smart-help">Upload a clear bill or screenshot. Detected item names and amounts will be shown as an editable list before saving.</div><input type="file" accept="image/*,.pdf" onchange="smartAnalyze(this,'grocery')"><div id="smart-grocery-result" class="smart-result"></div></div>
+${['Kitchen / Cooking','Cleaning','Personal Care','Pooja Items','Other'].map(c=>`<h3>${c}</h3><div class="list">${data.groceries.filter(g=>g.category==c).map((g,i)=>`<div class="item ${g.done?'done':''}"><label><input type="checkbox" ${g.done?'checked':''} onchange="toggleGrocery(${data.groceries.indexOf(g)})"> <b>${esc(g.name)}</b></label> <span class="badge">${g.freq}</span><div class="muted">${esc(g.qty||'')}</div><div class="actions"><button class="small editbtn" onclick="editGrocery(${data.groceries.indexOf(g)})">✏️ Edit</button><button class="small" onclick="removeItem('groceries',${data.groceries.indexOf(g)})">🗑️ Delete</button><button class="small savebtn" onclick="save()">💾 Save</button></div></div>`).join('')||'<div class="muted">No items yet.</div>'}</div>`).join('')}`}
+function addGrocery(e){e.preventDefault();data.groceries.push({name:gn.value,category:gc.value,qty:gqty.value,freq:gf.value,done:false});save();go('grocery')}
+function toggleGrocery(i){data.groceries[i].done=!data.groceries[i].done;save();render()}
+function reportsPage(){let cats={};data.expenses.forEach(x=>cats[x.category]=(cats[x.category]||0)+ +x.amount);return `<h2>Reports</h2><div class="grid"><div class="card"><h3>Total Income</h3><div class="amount">${money(totalIncome('Monthly')+totalIncome('Daily'))}</div></div><div class="card"><h3>Total Expenses</h3><div class="amount">${money(data.expenses.reduce((a,x)=>a+ +x.amount,0))}</div></div><div class="card"><h3>Total Savings Paid</h3><div class="amount">${money(data.savings.reduce((a,x)=>a+ +(x.paid||0),0))}</div></div></div><div class="card"><h3>Expense by Category</h3><table><tr><th>Category</th><th>Amount</th></tr>${Object.entries(cats).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${money(v)}</td></tr>`).join('')||'<tr><td colspan="2">No data</td></tr>'}</table></div><div class="card"><h3>Data Backup</h3><button class="primary" onclick="downloadData()">Download Backup</button> <button class="primary" onclick="document.getElementById('restore').click()">Restore Backup</button><input id="restore" class="hidden" type="file" accept=".json" onchange="restoreData(event)"></div>`}
+function downloadData(){let b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='home-money-manager-backup.json';a.click()}
+function restoreData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);save();render()}catch{alert('Invalid backup')}};r.readAsText(f)}
+render();
+
+async function smartAnalyze(input,kind){const file=input.files&&input.files[0];if(!file)return;const out=document.getElementById('smart-'+kind+'-result');out.innerHTML='<p class="small-note">🔎 Analysing your file…</p>';if(file.type==='application/pdf'||/\.pdf$/i.test(file.name)){out.innerHTML='<div class="card"><b>PDF selected.</b><div class="smart-help">For reliable automatic reading in this offline page, upload a clear screenshot/image of the PDF page. You can still enter the data manually.</div></div>';return}try{if(!window.Tesseract){await new Promise((ok,no)=>{let z=document.createElement('script');z.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';z.onload=ok;z.onerror=no;document.head.appendChild(z)})}let r=await Tesseract.recognize(file,'eng');let text=r.data.text||'';let lines=text.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);let rows=lines.map(line=>{let ns=(line.match(/(?:₹|Rs\.?|INR)?\s*[\d,]+(?:\.\d{1,2})?/g)||[]).map(x=>parseFloat(x.replace(/[^\d.]/g,''))).filter(n=>!isNaN(n));return {text:line,amount:ns.length?ns[ns.length-1]:0,date:(line.match(/\b\d{1,4}[-\/]\d{1,2}[-\/]\d{1,4}\b/)||[])[0]||today()}}).filter(x=>x.amount>0);window._smartRows=rows;window._smartKind=kind;if(!rows.length){out.innerHTML='<div class="card">No clear amount was detected. Please use a clearer image or enter manually.</div>';return}out.innerHTML='<div class="card"><b>Detected '+rows.length+' possible entry/entries</b><div class="smart-help">Review the list before saving.</div><button class="primary" style="margin-top:10px" onclick="reviewSmartRows()">✓ Review & Edit</button></div>'}catch(e){out.innerHTML='<div class="card">Could not analyse this image. Try a clearer photo with good lighting.</div>'}}
+function reviewSmartRows(){let rows=window._smartRows||[],kind=window._smartKind;if(!rows.length)return;let out=document.getElementById('smart-'+kind+'-result');let fields=rows.map((r,i)=>`<div class="smart-row"><input id="srdesc${i}" value="${esc(r.text)}"><input id="sramt${i}" type="number" step="0.01" value="${r.amount}"></div>`).join('');out.innerHTML=`<div class="card"><h4>✏️ Review before saving</h4><div class="smart-help">You can edit every detected line and amount.</div>${fields}<button class="primary" onclick="saveReviewedSmartRows()">💾 Save Reviewed Data</button></div>`}
+function saveReviewedSmartRows(){let rows=window._smartRows||[],kind=window._smartKind;if(!rows.length)return;if(kind==='grocery'){data.groceries=data.groceries||[];rows.forEach((r,i)=>data.groceries.push({name:document.getElementById('srdesc'+i).value,category:'Other',qty:'',freq:'As Needed',done:false,amount:+document.getElementById('sramt'+i).value||0,date:r.date}))}else if(kind==='expense'){rows.forEach((r,i)=>data.expenses.push({source:'Monthly Income',amount:+document.getElementById('sramt'+i).value||0,category:document.getElementById('srdesc'+i).value,method:'Cash',date:r.date,note:'Imported from bill — reviewed'}))}else if(kind==='saving'){rows.forEach((r,i)=>data.savings.push({name:document.getElementById('srdesc'+i).value,type:'Other',amount:+document.getElementById('sramt'+i).value||0,total:+document.getElementById('sramt'+i).value||0,start:r.date,end:'',lastPaid:null,nextDue:r.date,method:'Cash',paid:0}))}else if(kind==='recharge'){rows.forEach((r,i)=>data.recharges.push({name:document.getElementById('srdesc'+i).value,type:'Other',amount:+document.getElementById('sramt'+i).value||0,date:r.date,method:'GPay'}))}save();render()}
+</script>
+</body>
+</html>
