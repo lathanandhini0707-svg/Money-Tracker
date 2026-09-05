@@ -1,9 +1,0 @@
-{
-  "name":"Home & Money Manager",
-  "short_name":"Home Money",
-  "start_url":"./",
-  "display":"standalone",
-  "background_color":"#f3f7f6",
-  "theme_color":"#167d78",
-  "description":"Offline household income, expenses, savings, accounts, recharge and grocery manager."
-}
