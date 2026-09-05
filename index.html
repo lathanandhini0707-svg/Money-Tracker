@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#5b67d8">
+<title>HomeFlow — Home & Money</title>
+<style>
+:root{
+  --primary:#5b67d8; --primary2:#7b61c9; --accent:#22a890;
+  --bg:#f5f7fb; --card:#ffffff; --text:#20263a; --muted:#778096;
+  --line:#e8ebf3; --danger:#d85b68; --shadow:0 12px 30px rgba(43,53,91,.08);
+  --radius:20px;
+}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(145deg,#f7f8fc,#eef1fb);color:var(--text)}
+button,input,select,textarea{font:inherit} button{cursor:pointer}
+.app{max-width:1100px;margin:auto;min-height:100vh}
+.topbar{height:76px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;background:rgba(247,248,252,.9);backdrop-filter:blur(14px)}
+.brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:19px}.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--primary),var(--primary2));display:grid;place-items:center;color:white;box-shadow:0 8px 18px rgba(91,103,216,.25)}
+.menu-btn{width:44px;height:44px;border:0;border-radius:14px;background:#fff;box-shadow:var(--shadow);font-size:25px;color:var(--text)}
+main{padding:10px 18px 40px}.hero{padding:26px 22px 22px;border-radius:28px;background:linear-gradient(135deg,#eef0ff,#f8f5ff 58%,#eaf8f4);border:1px solid rgba(255,255,255,.8);box-shadow:var(--shadow)}
+.greeting{font-size:clamp(28px,6vw,44px);margin:0 0 6px;letter-spacing:-1.5px}.welcome{color:var(--muted);margin:0}.date{display:inline-flex;margin-top:18px;padding:9px 13px;border-radius:12px;background:#fff;color:#5d6680;font-size:13px;font-weight:650}
+.panel{display:none;margin-top:18px}.panel.active{display:block}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:6px 2px 14px}.panel-head h2{margin:0;font-size:23px}.back{border:0;background:#fff;border:1px solid var(--line);padding:9px 13px;border-radius:12px;color:var(--primary);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.tile{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 7px 22px rgba(43,53,91,.05);min-height:104px}.tile b{display:block;margin-top:8px;font-size:14px}.tile span{font-size:12px;color:var(--muted)}.icon{font-size:22px}
+.content{margin-top:14px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--shadow)}
+.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.field label{display:block;font-size:12px;font-weight:750;margin-bottom:6px;color:#606a80}.field input,.field select,.field textarea{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:13px;outline:none;background:#fbfcfe;color:var(--text)}textarea{min-height:90px;resize:vertical}.req{color:var(--danger)}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}.primary{border:0;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;padding:11px 17px;border-radius:13px;font-weight:750}.secondary{border:1px solid var(--line);background:#fff;padding:11px 15px;border-radius:13px;font-weight:700;color:#5e6880}
+.checklist{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:12px}.check{display:flex;align-items:center;gap:9px;padding:11px;border:1px solid var(--line);border-radius:13px;background:#fafbfe}.check input{accent-color:var(--primary)}.amount{margin-left:auto;width:90px;padding:7px;border:1px solid var(--line);border-radius:9px}
+.notice{padding:12px 14px;border-radius:14px;background:#f1f4ff;color:#515c7d;font-size:13px;margin-bottom:12px}
+.drawer{position:fixed;inset:0;z-index:50;background:rgba(24,29,47,.38);display:none}.drawer.open{display:block}.sheet{position:absolute;right:0;top:0;height:100%;width:min(390px,92vw);background:#fbfcff;padding:20px;overflow:auto;box-shadow:-20px 0 45px rgba(20,25,50,.16)}.sheet-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.sheet h2{margin:0}.close{border:0;background:#eef0f7;border-radius:11px;width:38px;height:38px;font-size:20px}.menu-list{display:grid;gap:8px}.menu-item{width:100%;border:1px solid var(--line);background:#fff;padding:14px;border-radius:14px;text-align:left;display:flex;align-items:center;gap:12px;font-weight:700;color:var(--text)}.menu-item:hover{border-color:#cfd4f5;background:#f8f8ff}.mi{width:34px;height:34px;border-radius:10px;background:#eef0ff;display:grid;place-items:center}
+.reminder{position:fixed;inset:0;z-index:80;background:rgba(22,27,45,.45);display:none;place-items:center;padding:20px}.reminder.show{display:grid}.rem-card{width:min(430px,100%);background:#fff;border-radius:25px;padding:23px;box-shadow:0 25px 70px rgba(10,15,35,.25)}.rem-top{display:flex;align-items:center;gap:12px}.bell{width:46px;height:46px;border-radius:14px;background:#fff3df;display:grid;place-items:center;font-size:23px}.rem-card h3{margin:0}.rem-card p{color:var(--muted);line-height:1.55}.rem-actions{display:flex;gap:9px}.rem-actions button{flex:1}.empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed #d9ddea;border-radius:16px}
+.small-note{font-size:12px;color:var(--muted);margin-top:8px}
+@media(max-width:760px){.grid{grid-template-columns:repeat(2,1fr)}.formgrid,.checklist{grid-template-columns:1fr}.topbar{height:70px}}
+@media(max-width:430px){main{padding:8px 12px 30px}.hero{padding:22px 17px}.tile{padding:13px}.content{padding:14px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+  <div class="brand"><div class="logo">⌂</div><span>HomeFlow</span></div>
+  <button class="menu-btn" onclick="openMenu()" aria-label="Main menu">⋮</button>
+</header>
+
+<main>
+<section id="home" class="hero">
+  <h1 id="greeting" class="greeting">Good Evening</h1>
+  <p class="welcome">Welcome — your home, money & plans in one place.</p>
+  <div id="date" class="date"></div>
+</section>
+
+<div id="panels"></div>
+</main>
+</div>
+
+<div id="drawer" class="drawer" onclick="closeMenu(event)">
+ <aside class="sheet" onclick="event.stopPropagation()">
+  <div class="sheet-top"><h2>Main Menu</h2><button class="close" onclick="closeMenu()">×</button></div>
+  <div id="menuList" class="menu-list"></div>
+ </aside>
+</div>
+
+<div id="reminder" class="reminder">
+ <div class="rem-card">
+  <div class="rem-top"><div class="bell">🔔</div><div><h3 id="remTitle">Reminder</h3><span class="small-note">Section reminder</span></div></div>
+  <p id="remText">You have a pending item.</p>
+  <div class="rem-actions">
+   <button class="secondary" onclick="remLater()">Later</button>
+   <button class="secondary" onclick="remClose()">Close</button>
+   <button class="primary" onclick="remComplete()">Complete</button>
+  </div>
+ </div>
+</div>
+
+<script>
+const sections=[
+ ['income','💰','Income'],['expenses','🧾','Expenses'],['accounts','🏦','Accounts'],['loans','📑','Loans / EMI'],
+ ['recharge','📱','Recharge'],['grocery','🛒','Grocery'],['savings','🎯','Savings'],['home-management','🏠','Home Management'],
+ ['reminders','🔔','Reminders'],['notes','📝','Notes'],['documents','📂','Documents'],['reports','📊','Reports'],
+ ['image-import','📷','Image Import'],['backup','💾','Backup / Restore'],['settings','⚙️','Settings']
+];
+const data={
+income:{boxes:[['💵','Monthly Income','Separate monthly total'],['☀️','Daily Income','Today / daily total'],['➕','Add Income','Save a new record'],['🖼️','Image Import','Analyse & confirm']],form:`<div class="notice">Income Type-ஐ தேர்வு செய்து amount, date, source, account ஆகியவற்றை பதிவு செய்யலாம்.</div><div class="formgrid"><div class="field"><label>Income Type <i class="req">*</i></label><select><option>Monthly Income</option><option>Daily Income</option></select></div><div class="field"><label>Amount <i class="req">*</i></label><input type="number" placeholder="₹ 0"></div><div class="field"><label>Date <i class="req">*</i></label><input type="date"></div><div class="field"><label>Source <i class="req">*</i></label><input placeholder="Salary / Business / Other"></div><div class="field"><label>Account</label><select><option>Select account</option><option>My Account</option><option>Mother</option><option>Father</option><option>Husband</option></select></div></div><div class="actions"><button class="primary">Save Income</button><button class="secondary">Cancel</button></div>`},
+expenses:{boxes:[['📅','Monthly Expense','This month'],['☀️','Daily Expense','Today'],['💡','Remaining Balance','After expenses'],['✨','Smart Savings','Suggested allocation']],form:`<div class="formgrid"><div class="field"><label>Category <i class="req">*</i></label><select><option>Grocery</option><option>Recharge</option><option>EMI</option><option>Dress</option><option>Home</option><option>Travel</option><option>Medical</option><option>Other</option></select></div><div class="field"><label>Amount <i class="req">*</i></label><input type="number" placeholder="₹ 0"></div><div class="field"><label>Date <i class="req">*</i></label><input type="date"></div><div class="field"><label>Account</label><select><option>Select account</option><option>Bank</option><option>GPay</option><option>Cash</option></select></div></div><div class="actions"><button class="primary">Save Expense</button><button class="secondary">Cancel</button></div>`},
+accounts:{boxes:[['🏦','Bank Accounts','Person-wise accounts'],['💳','GPay','Separate balance'],['📒','Monthly Ledger','Opening → Closing'],['📄','Statements','Image / PDF / Excel']],form:`<div class="formgrid"><div class="field"><label>Person <i class="req">*</i></label><select><option>My Account</option><option>Mother</option><option>Father</option><option>Husband</option><option>Other</option></select></div><div class="field"><label>Bank Name <i class="req">*</i></label><input placeholder="SBI / HDFC / Indian Bank"></div><div class="field"><label>Account Holder Name <i class="req">*</i></label><input></div><div class="field"><label>Account Number <i class="req">*</i></label><input type="password" placeholder="••••••••"></div><div class="field"><label>IFSC <i class="req">*</i></label><input></div><div class="field"><label>Branch</label><input></div><div class="field"><label>Account Type</label><select><option>Savings</option><option>Current</option><option>Other</option></select></div><div class="field"><label>Current Balance</label><input type="number" placeholder="₹ 0"></div></div><div class="small-note">Sensitive PINs/passwords should not be stored as plain text.</div><div class="actions"><button class="primary">Save Account</button></div>`},
+loans:{boxes:[['💳','Total Loan','Outstanding'],['📆','Next EMI','Due date'],['₹','Principal','Remaining'],['🧮','EMI Calculator','Payment split']],form:`<div class="formgrid"><div class="field"><label>Person <i class="req">*</i></label><select><option>My Account</option><option>Mother</option><option>Father</option><option>Husband</option><option>Other</option></select></div><div class="field"><label>Original Principal <i class="req">*</i></label><input type="number"></div><div class="field"><label>Interest</label><input type="number"></div><div class="field"><label>Paid Principal</label><input type="number"></div><div class="field"><label>Paid Interest</label><input type="number"></div><div class="field"><label>EMI Amount</label><input type="number"></div><div class="field"><label>Next EMI Date</label><input type="date"></div></div><div class="actions"><button class="primary">Save Loan</button></div>`},
+recharge:{boxes:[['👨‍👩‍👧','People','Recharge profiles'],['💸','This Month','Total recharge'],['📅','Next Recharge','Upcoming'],['🧾','Receipts','Import & confirm']],form:`<div class="formgrid"><div class="field"><label>Name <i class="req">*</i></label><input></div><div class="field"><label>Mobile Number <i class="req">*</i></label><input type="tel"></div><div class="field"><label>Network</label><select><option>Select network</option><option>Jio</option><option>Airtel</option><option>Vi</option><option>BSNL</option></select></div><div class="field"><label>Amount <i class="req">*</i></label><input type="number"></div><div class="field"><label>Recharge Date</label><input type="date"></div><div class="field"><label>Validity</label><input placeholder="28 days"></div><div class="field"><label>Next Recharge</label><input type="date"></div></div><div class="actions"><button class="primary">Save Recharge</button></div>`},
+grocery:{boxes:[['🍳','Kitchen','Staples & cooking'],['🧴','Home / Personal','Daily-use & cleaning'],['🪔','Pooja','Pooja items'],['☑️','Checklist','Choose + amount']],form:`<div class="field"><label>Category <i class="req">*</i></label><select id="gcat" onchange="renderGrocery()"><option value="kitchen">Kitchen Items</option><option value="home">Home / Personal & Cleaning</option><option value="pooja">Pooja Items</option></select></div><div id="groceryList" class="checklist"></div><div class="field" style="margin-top:12px"><label>Purchase Date <i class="req">*</i></label><input type="date"></div><div class="actions"><button class="primary">Save Grocery</button><button class="secondary">Clear</button></div>`},
+savings:{boxes:[['📌','Savings Plans','FD / FDR / RD / Gold'],['🎯','Goals','Trip / Emergency / Home'],['📈','Next Paycheck','Plan ahead'],['💰','Saved Amount','Progress']],form:`<div class="notice">Savings Plans மற்றும் Savings Goals தனித்தனியாக maintain செய்யப்படும்.</div><div class="formgrid"><div class="field"><label>Type <i class="req">*</i></label><select><option>Savings Plan</option><option>Goal</option></select></div><div class="field"><label>Choose Plan / Goal <i class="req">*</i></label><select><option>FD</option><option>FDR</option><option>Digi Gold</option><option>RD</option><option>Mutual Fund</option><option>Trip</option><option>Emergency</option><option>Home Decoration</option><option>Dress</option><option>Outing</option><option>Other</option></select></div><div class="field"><label>Target Amount <i class="req">*</i></label><input type="number"></div><div class="field"><label>Already Saved</label><input type="number"></div><div class="field"><label>Monthly Contribution</label><input type="number"></div><div class="field"><label>Target / Maturity Date</label><input type="date"></div><div class="field"><label>Next Month Paycheck</label><input type="number"></div></div><div class="actions"><button class="primary">Save Plan</button></div>`},
+'home-management':{boxes:[['🧹','Cleaning','House / Kitchen / Bathroom'],['🔧','Service','AC / RO / Fridge'],['🛠️','Repair','Cost & next check'],['🔔','Next Reminder','Upcoming']],form:`<div class="formgrid"><div class="field"><label>Type <i class="req">*</i></label><select><option>Cleaning</option><option>Service</option><option>Repair</option></select></div><div class="field"><label>Item / Area <i class="req">*</i></label><input placeholder="Kitchen / AC / RO..."></div><div class="field"><label>Date</label><input type="date"></div><div class="field"><label>Cost</label><input type="number"></div><div class="field"><label>Status</label><select><option>Pending</option><option>Complete</option><option>Later</option></select></div><div class="field"><label>Next Check</label><input type="date"></div></div><div class="actions"><button class="primary">Save</button></div>`},
+reminders:{boxes:[['🔔','Pending','Open reminders'],['✅','Completed','Finished'],['🔁','Recurring','Repeat schedules'],['📅','Upcoming','Next dates']],form:`<div class="formgrid"><div class="field"><label>Reminder Title <i class="req">*</i></label><input></div><div class="field"><label>Section <i class="req">*</i></label><select><option>EMI</option><option>Recharge</option><option>Grocery</option><option>Savings</option><option>Home Management</option><option>Notes</option><option>Other</option></select></div><div class="field"><label>Date <i class="req">*</i></label><input type="date"></div><div class="field"><label>Repeat</label><select><option>None</option><option>Daily</option><option>Weekly</option><option>Monthly</option></select></div></div><div class="actions"><button class="primary">Save Reminder</button></div>`},
+notes:{boxes:[['📝','Notes','Quick notes'],['🔔','Reminder','Optional'],['📎','Attachment','Image / document'],['✏️','Manage','Edit / Delete']],form:`<div class="formgrid"><div class="field"><label>Title <i class="req">*</i></label><input></div><div class="field"><label>Date</label><input type="date"></div></div><div class="field" style="margin-top:12px"><label>Description <i class="req">*</i></label><textarea></textarea></div><div class="actions"><button class="primary">Save Note</button></div>`},
+documents:{boxes:[['🏦','Bank Docs','Statements / passbook'],['🧾','Bills','Grocery / service'],['📑','Loan Papers','Loan documents'],['📂','All Documents','Stored files']],form:`<div class="notice">Original image/PDF-ஐ preserve செய்து, extracted data-வை preview → edit → confirm செய்த பிறகே record-ல் save செய்யலாம்.</div><div class="actions"><button class="primary">📷 Choose Image</button><button class="secondary">📄 Choose PDF</button><button class="secondary">📊 Choose Excel</button></div>`},
+reports:{boxes:[['📅','Monthly Summary','1st → last day'],['💰','Income','Monthly + Daily'],['🧾','Expenses','Category totals'],['📥','Export','PDF / Excel']],form:`<div class="formgrid"><div class="field"><label>Month <i class="req">*</i></label><input type="month"></div><div class="field"><label>Report Type</label><select><option>Monthly Summary</option><option>Accounts</option><option>Income & Expenses</option><option>All</option></select></div></div><div class="actions"><button class="primary">View Report</button><button class="secondary">Export PDF</button><button class="secondary">Export Excel</button></div>`},
+'image-import':{boxes:[['📷','Image','Camera / gallery'],['📄','PDF','Statement / bill'],['📊','Excel','Sheets / data'],['🔍','Preview','Edit before save']],form:`<div class="notice"><b>Same Import System:</b> Section → Upload → Processing → Detected Data → Edit / Delete → OK → Save. Data will be routed to the selected section only.</div><div class="formgrid"><div class="field"><label>Send Data To <i class="req">*</i></label><select><option>Income</option><option>Accounts</option><option>Loans / EMI</option><option>Recharge</option><option>Grocery</option><option>Savings</option><option>Home Management</option><option>Documents</option></select></div><div class="field"><label>File</label><input type="file" accept="image/*,.pdf,.xlsx,.xls"></div></div><div class="actions"><button class="primary">Process & Preview</button></div>`},
+backup:{boxes:[['💾','Backup','All app data'],['📥','Restore','Bring data back'],['📂','Documents','Include files'],['🔐','Privacy','Local control']],form:`<div class="notice">Backup/Restore should preserve records and documents. Manual delete should always ask for confirmation.</div><div class="actions"><button class="primary">Create Backup</button><button class="secondary">Restore Backup</button></div>`},
+settings:{boxes:[['🔒','Privacy','Sensitive fields'],['🔔','Notifications','Reminder settings'],['🎨','Appearance','Theme'],['⚙️','App Settings','Preferences']],form:`<div class="formgrid"><div class="field"><label>Reminder Notifications</label><select><option>On</option><option>Off</option></select></div><div class="field"><label>Default Currency</label><select><option>INR ₹</option></select></div></div><div class="actions"><button class="primary">Save Settings</button></div>`}
+};
+const grocery={
+kitchen:['Mustard','Urad Dal','Toor Dal','Chana Dal','Rice','Wheat','Oil','Spices','Salt','Sugar','Other'],
+home:['Shampoo','Hair Oil','Soap','Toothpaste','Washing Powder','Dish Wash','Bathroom Cleaner','Floor Cleaner','Room Cleaner','Freshener','Other'],
+pooja:['Oil','Camphor','Incense Sticks','Wick','Cotton','Turmeric','Kumkum','Flowers','Fruits','Sugar / Prasad Items','Other']
+};
+let current=null;
+function updateHome(){const h=new Date().getHours();let g=h<5?'Good Night':h<12?'Good Morning':h<17?'Good Afternoon':h<21?'Good Evening':'Good Night';document.getElementById('greeting').textContent=g;document.getElementById('date').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});}
+function buildMenu(){document.getElementById('menuList').innerHTML=sections.map(s=>`<button class="menu-item" onclick="openSection('${s[0]}')"><span class="mi">${s[1]}</span>${s[2]}</button>`).join('');}
+function openMenu(){document.getElementById('drawer').classList.add('open')}
+function closeMenu(e){if(!e||e.target.id==='drawer')document.getElementById('drawer').classList.remove('open')}
+function openSection(id){current=id;closeMenu();document.getElementById('home').style.display='none';const p=data[id]||{boxes:[['📌','Dashboard','Section overview']],form:'<div class="empty">This section is ready for your data.</div>'};document.getElementById('panels').innerHTML=`<section class="panel active"><div class="panel-head"><h2>${sections.find(x=>x[0]===id)[1]} Dashboard</h2><button class="back" onclick="goHome()">⌂ Home</button></div><div class="grid">${p.boxes.map(b=>`<div class="tile"><div class="icon">${b[0]}</div><b>${b[1]}</b><span>${b[2]}</span></div>`).join('')}</div><div class="content">${p.form}</div></section>`;if(id==='grocery')renderGrocery();showReminder(id);}
+function goHome(){document.getElementById('panels').innerHTML='';document.getElementById('home').style.display='block';current=null}
+function renderGrocery(){const el=document.getElementById('groceryList');if(!el)return;const cat=document.getElementById('gcat').value;el.innerHTML=grocery[cat].map(x=>`<label class="check"><input type="checkbox"> <span>${x}</span><input class="amount" type="number" placeholder="₹"></label>`).join('');}
+function showReminder(id){const names={income:'Income reminder',expenses:'Expense reminder',accounts:'Account reminder',loans:'EMI payment reminder',recharge:'Recharge reminder',grocery:'Grocery reminder',savings:'Savings plan reminder','home-management':'Home service / cleaning reminder',notes:'Notes reminder',documents:'Document reminder'};if(names[id]){document.getElementById('remTitle').textContent=names[id];document.getElementById('remText').textContent='You have a reminder related to this section. Close this popup to continue.';document.getElementById('reminder').classList.add('show');}}
+function remClose(){document.getElementById('reminder').classList.remove('show')}
+function remLater(){remClose()}
+function remComplete(){remClose()}
+updateHome();buildMenu();setInterval(updateHome,60000);
+</script>
+</body>
+</html>
